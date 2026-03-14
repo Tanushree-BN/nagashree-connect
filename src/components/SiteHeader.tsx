@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Phone, Mail } from "lucide-react";
 import { contactInfo } from "@/data/schoolData";
-import logo from "@/assets/logo.png";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -17,7 +16,23 @@ const navLinks = [
 const SiteHeader = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
+
+  // Check admin session
+  useEffect(() => {
+    const checkAdmin = () => {
+      setIsAdmin(sessionStorage.getItem("nagashree_admin") === "true");
+    };
+    checkAdmin();
+    // Re-check on route change to catch login/logout events
+  }, [location.pathname]);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("nagashree_admin");
+    setIsAdmin(false);
+    window.location.href = "/";
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -56,7 +71,7 @@ const SiteHeader = () => {
       <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? "bg-card shadow-lg" : "bg-card/95 backdrop-blur-md"}`}>
         <div className="container mx-auto flex items-center justify-between py-3 px-4">
           <Link to="/" className="flex items-center gap-3">
-            <img src={logo} alt="Nagashree English School logo" className="w-12 h-12 object-contain" />
+            <img src="/images/nag-logo.png" alt="Nagashree English School logo" className="w-12 h-12 object-contain" />
             <div>
               <span className="font-display font-bold text-lg text-primary leading-tight block">Nagashree English School</span>
               <span className="text-xs text-muted-foreground">Channarayapatna, Hassan</span>
@@ -78,6 +93,39 @@ const SiteHeader = () => {
                 {link.label}
               </Link>
             ))}
+            
+            {/* Admin Conditional Nav */}
+            {isAdmin ? (
+              <div className="flex items-center ml-2 border-l border-border pl-2 border-primary-foreground/20">
+                <Link
+                  to="/admin"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    location.pathname.startsWith("/admin")
+                      ? "bg-gold text-secondary-foreground"
+                      : "text-gold hover:text-gold-dark hover:bg-muted"
+                  }`}
+                >
+                  Admin Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 ml-1 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/admin/login"
+                className={`px-4 py-2 ml-2 rounded-lg text-sm font-medium transition-colors ${
+                  location.pathname === "/admin/login"
+                    ? "bg-gold text-secondary-foreground"
+                    : "text-gold hover:text-gold-dark hover:bg-muted"
+                }`}
+              >
+                Admin Login
+              </Link>
+            )}
           </nav>
 
           {/* Mobile toggle */}
@@ -106,6 +154,41 @@ const SiteHeader = () => {
                 {link.label}
               </Link>
             ))}
+            
+            {/* Mobile Admin Conditional Nav */}
+            <div className="mt-2 pt-2 border-t border-border">
+              {isAdmin ? (
+                <>
+                  <Link
+                    to="/admin"
+                    className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                      location.pathname.startsWith("/admin")
+                        ? "bg-gold text-secondary-foreground"
+                        : "text-gold hover:text-gold-dark hover:bg-muted"
+                    }`}
+                  >
+                    Admin Dashboard
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left block px-4 py-3 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/admin/login"
+                  className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                    location.pathname === "/admin/login"
+                      ? "bg-gold text-secondary-foreground"
+                      : "text-gold hover:text-gold-dark hover:bg-muted"
+                  }`}
+                >
+                  Admin Login
+                </Link>
+              )}
+            </div>
           </nav>
         )}
       </header>

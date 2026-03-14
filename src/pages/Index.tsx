@@ -9,8 +9,6 @@ import SiteFooter from "@/components/SiteFooter";
 import StatCounter from "@/components/StatCounter";
 import { features, offerings, stats, contactInfo, schoolDescription } from "@/data/schoolData";
 import { getGalleryImages } from "@/lib/store";
-import heroImg from "@/assets/hero-school.jpg";
-import aboutImg from "@/assets/about-school.jpg";
 import { useState } from "react";
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -48,7 +46,7 @@ const Index = () => {
         {/* Hero */}
         <section className="relative min-h-[85vh] flex items-center overflow-hidden">
           <div className="absolute inset-0">
-            <img src={heroImg} alt="Nagashree English School campus" className="w-full h-full object-cover" />
+            <img src="/images/clg1.JPG" alt="Nagashree English School campus" className="w-full h-full object-cover" loading="eager" fetchPriority="high" />
             <div className="absolute inset-0 bg-gradient-to-r from-navy-dark/90 via-navy-dark/70 to-navy-dark/40" />
           </div>
           <div className="container mx-auto px-4 relative z-10">
@@ -120,10 +118,11 @@ const Index = () => {
                 viewport={{ once: true }}
               >
                 <img
-                  src={aboutImg}
+                  src="/images/RKP_9725.JPG"
                   alt="What we offer at Nagashree English School"
-                  className="rounded-2xl shadow-lg w-full object-cover aspect-[4/3]"
+                  className="rounded-2xl shadow-lg w-full object-cover aspect-[4/3] object-top"
                   loading="lazy"
+                  decoding="async"
                 />
               </motion.div>
               <motion.div
@@ -166,11 +165,11 @@ const Index = () => {
                 className="relative aspect-video rounded-2xl overflow-hidden bg-navy-light"
               >
                 {showVideo ? (
-                  <iframe
-                    src="https://www.youtube.com/embed/?listType=user_uploads&list=Nagashreeenglishschool&autoplay=1"
-                    className="w-full h-full"
-                    allow="autoplay; encrypted-media"
-                    allowFullScreen
+                  <video
+                    src="/images/vedio.mp4"
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    controls
                     title="Nagashree English School video"
                   />
                 ) : (
@@ -178,7 +177,7 @@ const Index = () => {
                     onClick={() => setShowVideo(true)}
                     className="w-full h-full flex items-center justify-center group"
                   >
-                    <img src={heroImg} alt="School video thumbnail" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                    <img src="/images/bg2.JPG" alt="School video thumbnail" className="absolute inset-0 w-full h-full object-cover opacity-60" loading="lazy" decoding="async" />
                     <div className="relative w-20 h-20 rounded-full bg-gold flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                       <Play className="w-8 h-8 text-secondary-foreground ml-1" />
                     </div>

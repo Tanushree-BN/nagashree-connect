@@ -30,9 +30,13 @@ const Faculties = () => {
                 transition={{ delay: i * 0.05 }}
                 className="bg-card rounded-xl p-6 card-hover border border-border text-center"
               >
-                <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-                  <User className="w-10 h-10 text-muted-foreground" />
-                </div>
+                {faculty.image ? (
+                  <img src={faculty.image} alt={faculty.name} className="w-20 h-20 rounded-full object-cover mx-auto mb-4 shadow-sm border border-border" />
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                    <User className="w-10 h-10 text-muted-foreground" />
+                  </div>
+                )}
                 <h3 className="font-display text-lg font-semibold text-foreground">{faculty.name}</h3>
                 <p className="text-gold font-medium text-sm mt-1">{faculty.role}</p>
                 <p className="text-muted-foreground text-sm mt-2">{faculty.subject}</p>

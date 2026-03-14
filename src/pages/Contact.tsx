@@ -28,7 +28,15 @@ const Contact = () => {
   return (
     <>
       <SiteHeader />
-      <HeroBanner title="Contact Us" breadcrumb="Contact" />
+      <div className="relative">
+        <div className="absolute inset-0 h-[40vh] md:h-[50vh] min-h-[300px]">
+          <img src="/images/bg3.JPG" alt="Nagashree Contact Background" className="w-full h-full object-cover" loading="eager" fetchPriority="high" />
+          <div className="absolute inset-0 bg-navy-dark/80 backdrop-blur-[2px]" />
+        </div>
+        <div className="relative z-10">
+          <HeroBanner title="Contact Us" breadcrumb="Contact" />
+        </div>
+      </div>
       <main>
         <section className="section-padding bg-background">
           <div className="container mx-auto">

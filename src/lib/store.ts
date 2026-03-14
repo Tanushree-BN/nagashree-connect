@@ -14,6 +14,7 @@ export interface FacultyMember {
   role: string;
   subject: string;
   experience: string;
+  image?: string;
 }
 
 export interface ContactMessage {

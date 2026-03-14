@@ -19,7 +19,7 @@ const About = () => {
           <div className="container mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-                <img src={aboutImg} alt="Nagashree English School campus" className="rounded-2xl shadow-lg w-full object-cover aspect-[4/3]" loading="lazy" />
+                <img src="/images/clg2.JPG" alt="Nagashree English School campus" className="rounded-2xl shadow-lg w-full object-cover aspect-[4/3]" loading="lazy" decoding="async" />
               </motion.div>
               <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
                 <span className="text-gold font-semibold text-sm uppercase tracking-widest">What Makes Us Unique</span>

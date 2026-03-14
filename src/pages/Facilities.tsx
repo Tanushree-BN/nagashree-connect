@@ -40,14 +40,19 @@ const Facilities = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08 }}
                 onClick={() => setOpenFacility(facility.id)}
-                className="bg-card rounded-xl p-8 card-hover border border-border text-left focus:outline-none focus:ring-2 focus:ring-ring group"
+                className="bg-card rounded-xl overflow-hidden card-hover border border-border text-left focus:outline-none focus:ring-2 focus:ring-ring group flex flex-col"
               >
-                <div className="w-14 h-14 rounded-xl bg-gold/10 text-gold flex items-center justify-center mb-5 group-hover:bg-gold group-hover:text-secondary-foreground transition-colors">
-                  {iconMap[facility.icon]}
+                <div className="h-48 w-full overflow-hidden relative">
+                  <img src={facility.image} alt={facility.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                  <div className="absolute top-4 right-4 w-12 h-12 rounded-xl bg-card/90 backdrop-blur-sm text-gold flex items-center justify-center shadow-lg">
+                    {iconMap[facility.icon]}
+                  </div>
                 </div>
-                <h3 className="font-display text-xl font-semibold text-foreground mb-2">{facility.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">{facility.shortDesc}</p>
-                <span className="inline-block mt-4 text-gold text-sm font-medium">Learn more →</span>
+                <div className="p-6 flex-1 flex flex-col">
+                  <h3 className="font-display text-xl font-semibold text-foreground mb-2">{facility.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed flex-1">{facility.shortDesc}</p>
+                  <span className="inline-block mt-4 text-gold text-sm font-medium">Learn more →</span>
+                </div>
               </motion.button>
             ))}
           </div>
@@ -75,15 +80,21 @@ const Facilities = () => {
             >
               <button
                 onClick={() => setOpenFacility(null)}
-                className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
+                className="absolute top-4 right-4 text-muted-foreground hover:text-foreground z-10 bg-card rounded-full p-1 shadow-md"
                 aria-label="Close"
               >
                 <X className="w-5 h-5" />
               </button>
-              <div className="w-14 h-14 rounded-xl bg-gold/10 text-gold flex items-center justify-center mb-5">
-                {iconMap[activeFacility.icon]}
+              <div className="h-48 -mt-8 -mx-8 mb-6 overflow-hidden rounded-t-2xl relative">
+                <img src={activeFacility.image} alt={activeFacility.title} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-6 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-gold text-secondary-foreground flex items-center justify-center shadow-lg">
+                    {iconMap[activeFacility.icon]}
+                  </div>
+                  <h3 className="font-display text-2xl font-bold text-white">{activeFacility.title}</h3>
+                </div>
               </div>
-              <h3 className="font-display text-2xl font-bold text-foreground mb-4">{activeFacility.title}</h3>
               <ul className="space-y-3">
                 {activeFacility.details.map((detail) => (
                   <li key={detail} className="flex items-start gap-3 text-muted-foreground text-sm">

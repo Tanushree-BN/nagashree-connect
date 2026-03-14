@@ -92,6 +92,7 @@ export const facilities = [
       "Audio-visual teaching aids",
       "Climate-controlled classrooms",
     ],
+    image: "/images/std1.jpg",
   },
   {
     id: "science-labs",
@@ -105,6 +106,7 @@ export const facilities = [
       "Dedicated lab assistants",
       "Regular practical sessions",
     ],
+    image: "/images/std9.JPG",
   },
   {
     id: "library",
@@ -118,6 +120,7 @@ export const facilities = [
       "Quiet reading zones",
       "Regular book fairs and reading programs",
     ],
+    image: "/images/std6.JPG",
   },
   {
     id: "computer-lab",
@@ -131,6 +134,7 @@ export const facilities = [
       "Coding and robotics programs",
       "Dedicated IT instructors",
     ],
+    image: "/images/std36.JPG",
   },
   {
     id: "sports",
@@ -144,6 +148,7 @@ export const facilities = [
       "Annual sports day and inter-school tournaments",
       "Yoga and fitness programs",
     ],
+    image: "/images/sp1.JPG",
   },
   {
     id: "transport",
@@ -157,6 +162,7 @@ export const facilities = [
       "Door-to-door pickup and drop facility",
       "Emergency contact system",
     ],
+    image: "/images/std22.JPG",
   },
 ];
 
@@ -176,18 +182,24 @@ export const faculties = [
 ];
 
 export const galleryItems = [
-  { src: "/placeholder.svg", alt: "Annual day celebration on school stage", category: "events", title: "Annual Day 2024" },
-  { src: "/placeholder.svg", alt: "Students performing cultural dance", category: "events", title: "Cultural Festival" },
-  { src: "/placeholder.svg", alt: "Students studying in smart classroom", category: "classroom", title: "Smart Classroom" },
-  { src: "/placeholder.svg", alt: "Science experiment in the laboratory", category: "classroom", title: "Science Lab Session" },
-  { src: "/placeholder.svg", alt: "Students playing cricket on school ground", category: "sports", title: "Cricket Match" },
-  { src: "/placeholder.svg", alt: "School annual sports day races", category: "sports", title: "Sports Day" },
-  { src: "/placeholder.svg", alt: "Modern school library interior", category: "facilities", title: "Library" },
-  { src: "/placeholder.svg", alt: "Computer lab with students coding", category: "facilities", title: "Computer Lab" },
-  { src: "/placeholder.svg", alt: "Independence day flag hoisting ceremony", category: "events", title: "Independence Day" },
-  { src: "/placeholder.svg", alt: "Yoga session on school grounds", category: "sports", title: "Yoga Day" },
-  { src: "/placeholder.svg", alt: "Students in school assembly", category: "events", title: "Morning Assembly" },
-  { src: "/placeholder.svg", alt: "School bus fleet in campus", category: "facilities", title: "Transport Fleet" },
+  { src: "/images/bg1.JPG", alt: "Annual day celebration on school stage", category: "events", title: "Annual Day 2024" },
+  { src: "/images/RKP_0557 (1).JPG", alt: "Students performing cultural dance", category: "events", title: "Cultural Festival" },
+  { src: "/images/std30.JPG", alt: "Students studying in smart classroom", category: "classroom", title: "Smart Classroom" },
+  { src: "/images/std15.JPG", alt: "Science experiment in the laboratory", category: "classroom", title: "Science Lab Session" },
+  { src: "/images/sp1.JPG", alt: "Students playing cricket on school ground", category: "sports", title: "Cricket Match" },
+  { src: "/images/sp2.JPG", alt: "School annual sports day races", category: "sports", title: "Sports Day" },
+  { src: "/images/std10.JPG", alt: "Modern school library interior", category: "facilities", title: "Library" },
+  { src: "/images/std11.JPG", alt: "Computer lab with students coding", category: "facilities", title: "Computer Lab" },
+  { src: "/images/RKP_9681.JPG", alt: "Independence day flag hoisting ceremony", category: "events", title: "Independence Day" },
+  { src: "/images/std4.JPG", alt: "Yoga session on school grounds", category: "sports", title: "Yoga Day" },
+  { src: "/images/std29.JPG", alt: "Students in school assembly", category: "events", title: "Morning Assembly" },
+  { src: "/images/clg1.JPG", alt: "School bus fleet in campus", category: "facilities", title: "Transport Fleet" },
+  { src: "/images/std5.JPG", alt: "Students participating in school activity", category: "classroom", title: "Group Activity" },
+  { src: "/images/sp3.JPG", alt: "Students playing outdoors", category: "sports", title: "Outdoor Games" },
+  { src: "/images/std21.JPG", alt: "Students walking in school corridor", category: "facilities", title: "School Corridors" },
+  { src: "/images/RKP_0685.JPG", alt: "Aerial view of students in assembly", category: "events", title: "School Assembly" },
+  { src: "/images/std2.JPG", alt: "Students engaged in classroom learning", category: "classroom", title: "Interactive Learning" },
+  { src: "/images/clg2.JPG", alt: "View of the school building", category: "facilities", title: "Campus View" }
 ];
 
 export const galleryCategories = ["all", "events", "classroom", "sports", "facilities"] as const;

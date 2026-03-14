@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Trash2, Edit2, X, Save } from "lucide-react";
+import { Plus, Trash2, Edit2, X, Save, Upload, Image as ImageIcon } from "lucide-react";
 import { getGalleryImages, addGalleryImage, deleteGalleryImage, updateGalleryImage, type GalleryImage } from "@/lib/store";
 
 const AdminGallery = () => {
@@ -8,10 +8,69 @@ const AdminGallery = () => {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({ src: "", alt: "", category: "events", title: "" });
 
+  const MAX_IMAGES = 50;
+
   const refresh = () => setImages(getGalleryImages());
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please upload an image file.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        // Max dimensions
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        // Compress to JPEG format
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+        setForm({ ...form, src: dataUrl });
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
+    if (images.length >= MAX_IMAGES) {
+      alert(`Gallery limit reached. A maximum of ${MAX_IMAGES} images is allowed.`);
+      return;
+    }
+    
+    if (!form.src) {
+      alert("Please upload an image.");
+      return;
+    }
+
     addGalleryImage(form);
     setForm({ src: "", alt: "", category: "events", title: "" });
     setShowForm(false);
@@ -44,8 +103,25 @@ const AdminGallery = () => {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-2xl font-bold text-foreground">Gallery Management</h1>
-        <button onClick={() => { setShowForm(true); setEditId(null); setForm({ src: "", alt: "", category: "events", title: "" }); }} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gold text-secondary-foreground text-sm font-semibold hover:bg-gold-dark transition-colors">
+        <div>
+          <h1 className="font-display text-2xl font-bold text-foreground">Gallery Management</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Gallery Usage: <span className={images.length >= MAX_IMAGES ? "text-destructive font-bold" : "text-foreground font-medium"}>{images.length}</span> / {MAX_IMAGES} images
+          </p>
+        </div>
+        <button 
+          onClick={() => { 
+            if (images.length >= MAX_IMAGES) {
+              alert(`Gallery limit reached. A maximum of ${MAX_IMAGES} images is allowed.`);
+              return;
+            }
+            setShowForm(true); 
+            setEditId(null); 
+            setForm({ src: "", alt: "", category: "events", title: "" }); 
+          }} 
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gold text-secondary-foreground text-sm font-semibold hover:bg-gold-dark transition-colors"
+          disabled={images.length >= MAX_IMAGES}
+        >
           <Plus className="w-4 h-4" /> Add Image
         </button>
       </div>
@@ -58,9 +134,32 @@ const AdminGallery = () => {
             <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Image URL *</label>
-              <input required value={form.src} onChange={(e) => setForm({ ...form, src: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-input bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" placeholder="https://... or /placeholder.svg" />
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-foreground mb-1">Upload Image *</label>
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-border border-dashed rounded-lg hover:border-gold transition-colors">
+                <div className="space-y-1 text-center">
+                  {form.src ? (
+                    <div className="relative inline-block">
+                      <img src={form.src} alt="Preview" className="mx-auto h-32 w-auto rounded-md object-cover" />
+                      <button type="button" onClick={() => setForm({ ...form, src: "" })} className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 shadow-sm">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
+                      <div className="flex text-sm text-muted-foreground justify-center">
+                        <label htmlFor="file-upload" className="relative cursor-pointer rounded-md bg-background font-medium text-gold hover:text-gold-dark focus-within:outline-none">
+                          <span>Upload a file</span>
+                          <input id="file-upload" name="file-upload" type="file" className="sr-only" accept="image/*" onChange={handleImageUpload} />
+                        </label>
+                        <p className="pl-1">or drag and drop</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">PNG, JPG, GIF up to 5MB (Auto-compressed)</p>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">Title *</label>
