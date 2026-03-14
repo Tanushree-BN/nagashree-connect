@@ -8,9 +8,9 @@ export const contactInfo = {
     admin: "+91-9901181966",
   },
   socialLinks: {
-    youtube: "https://www.youtube.com/@nagashreeenglishschool",
-    facebook: "https://www.facebook.com/nagashreeenglishschool",
-    instagram: "https://www.instagram.com/nagashreeenglishschool",
+    youtube: "https://www.youtube.com/@Nagashreeenglishschool",
+    facebook: "https://www.facebook.com/nagashreeenglishschoolcrp?mibextid=wwXIfr&rdid=mmPr2DQflqkq6BaP&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F17uc3LVVsT%2F%3Fmibextid%3DwwXIfr",
+    instagram: "https://www.instagram.com/nagashree_english_school?igsh=eHhra3JqaTV5eWhq&utm_source=qr",
   },
   mapEmbedUrl:
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3880.0!2d76.38!3d12.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sNagashree+English+School!5e0!3m2!1sen!2sin!4v1",
@@ -18,42 +18,65 @@ export const contactInfo = {
 
 export const features = [
   {
+    icon: "GraduationCap",
+    title: "Certified Teachers",
+    description: "Certified teachers are educators who have completed required training, passed licensing exams, and met official standards set by an education authority. Their certification ensures they are qualified to teach specific subjects or grade levels.",
+  },
+  {
+    icon: "Sparkles",
+    title: "Special Education",
+    description: "Special education focuses on teaching students with learning, physical, emotional, or developmental disabilities. It provides individualized instruction and support to help each student succeed academically and socially.",
+  },
+  {
     icon: "BookOpen",
-    title: "Quality Education",
-    description: "Comprehensive curriculum aligned with CBSE standards fostering academic excellence and critical thinking.",
-  },
-  {
-    icon: "Users",
-    title: "Experienced Faculty",
-    description: "Dedicated and qualified teachers who inspire students to reach their fullest potential.",
-  },
-  {
-    icon: "Shield",
-    title: "Safe Environment",
-    description: "Secure campus with CCTV surveillance, trained staff, and strict safety protocols for every child.",
+    title: "Book & Library",
+    description: "Books are a valuable source of knowledge and entertainment for readers of all ages. Libraries store and organize books and other resources for easy access. They promote reading, research, and lifelong learning.",
   },
   {
     icon: "Trophy",
-    title: "Holistic Development",
-    description: "Beyond academics — sports, arts, cultural activities, and life skills for well-rounded growth.",
+    title: "Sport Clubs",
+    description: "Sports clubs provide opportunities for people to participate in organized sports activities. They help develop physical fitness, teamwork, and sportsmanship. Sports clubs also encourage social interaction and a healthy lifestyle.",
+  },
+];
+
+export const offerings = [
+  {
+    icon: "Shield",
+    title: "Safety First",
+    description: "Safety first means taking precautions to prevent accidents and injuries. It encourages awareness, responsibility, and careful behavior in all activities.",
   },
   {
-    icon: "Monitor",
-    title: "Smart Classrooms",
-    description: "Technology-integrated classrooms with digital boards and interactive learning tools.",
+    icon: "Clock",
+    title: "Regular Classes",
+    description: "Regular classes provide structured learning in a standard classroom setting.",
   },
   {
-    icon: "Bus",
-    title: "Safe Transport",
-    description: "GPS-tracked school buses covering all major routes with trained drivers and attendants.",
+    icon: "GraduationCap",
+    title: "Certified Teachers",
+    description: "Certified teachers are professionally trained and licensed to teach.",
+  },
+  {
+    icon: "Building",
+    title: "Sufficient Classrooms",
+    description: "Sufficient classrooms provide adequate space, seating, and learning facilities for students.",
+  },
+  {
+    icon: "Lightbulb",
+    title: "Creative Lessons",
+    description: "Creative lessons use new ideas, activities, and methods to make learning engaging. They encourage students to think critically and express themselves freely.",
+  },
+  {
+    icon: "Dumbbell",
+    title: "Sports Facilities",
+    description: "Sports facilities provide proper spaces and equipment for physical activities and games. They support fitness, teamwork, and skill development among students.",
   },
 ];
 
 export const stats = [
-  { value: 50, suffix: "+", label: "Qualified Teachers" },
-  { value: 1200, suffix: "+", label: "Happy Students" },
-  { value: 15, suffix: "+", label: "Years of Excellence" },
-  { value: 25, suffix: "+", label: "Awards Won" },
+  { value: 18, suffix: "", label: "Certified Teachers" },
+  { value: 401, suffix: "", label: "Students" },
+  { value: 30, suffix: "", label: "Courses" },
+  { value: 50, suffix: "", label: "Awards Won" },
 ];
 
 export const facilities = [
@@ -168,3 +191,5 @@ export const galleryItems = [
 ];
 
 export const galleryCategories = ["all", "events", "classroom", "sports", "facilities"] as const;
+
+export const schoolDescription = `Nagashree English School is built on the foundation of our belief that by working on our inner and outer worlds, we would be successful not only by chance but by design. Nagashree English School envisions nurturing confidence and independence, giving our children holistic curricular support they need; to grow into flexible and resilient young adults, ready to succeed in an ever more competitive world! Our caring facilitators and helpers ensure a safe and secure childhood for every student. Our unique curriculum helps in having joyful classes with effective learning and our system of assessments help children develop skills without feeling stressed out about learning and our entire system resonates with positivity and enthusiasm of learning, exploring, and creating. We together find joy in teaching and learning.`;

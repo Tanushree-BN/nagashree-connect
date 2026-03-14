@@ -14,7 +14,7 @@ const About = () => {
       <SiteHeader />
       <HeroBanner title="About Us" breadcrumb="About" />
       <main>
-        {/* Story */}
+        {/* Unique Story */}
         <section className="section-padding bg-background">
           <div className="container mx-auto">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -22,16 +22,13 @@ const About = () => {
                 <img src={aboutImg} alt="Nagashree English School campus" className="rounded-2xl shadow-lg w-full object-cover aspect-[4/3]" loading="lazy" />
               </motion.div>
               <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-                <span className="text-gold font-semibold text-sm uppercase tracking-widest">Our Story</span>
-                <h2 className="section-title mt-3 mb-6">A Legacy of Excellence in Education</h2>
+                <span className="text-gold font-semibold text-sm uppercase tracking-widest">What Makes Us Unique</span>
+                <h2 className="section-title mt-3 mb-6">What is unique about Nagashree English School</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Founded in 2009, Nagashree English School has grown from a small institution into one of the most trusted educational establishments in the Hassan district. Our journey has been driven by an unwavering commitment to providing quality education that prepares students for the challenges of tomorrow.
-                </p>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  Located on Shravanabelagola Road in Channarayapatna, our campus provides a serene and secure environment where children can learn, grow, and thrive. We believe that education is not just about textbooks — it's about building character, fostering creativity, and developing life skills.
+                  Nagashree English School is an awesome place of learning in many aspects. The beautiful, serene campus with state-of-the-art facilities, vast playgrounds, amazing Management and Staff, outstanding students and parents set it apart and it is indeed a wonderful place.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  With experienced faculty, state-of-the-art infrastructure, and a curriculum that balances academic rigor with extracurricular excellence, Nagashree English School continues to shape the leaders of tomorrow.
+                  But what makes it unique is its belief system which has enabled it to evolve as the most child-friendly atmosphere.
                 </p>
               </motion.div>
             </div>
@@ -41,6 +38,9 @@ const About = () => {
         {/* Vision & Mission */}
         <section className="section-padding bg-muted">
           <div className="container mx-auto">
+            <div className="text-center mb-14">
+              <h2 className="section-title">Our Vision & Mission</h2>
+            </div>
             <div className="grid md:grid-cols-2 gap-8">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-card rounded-xl p-10 card-hover border border-border">
                 <h3 className="font-display text-2xl font-bold text-foreground mb-4">Our Vision</h3>
@@ -76,8 +76,8 @@ const About = () => {
             <p className="text-muted-foreground text-lg mb-8">
               Discover what makes Nagashree English School the right choice for your child's education.
             </p>
-            <Link to="/contact" className="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-gold text-secondary-foreground font-semibold hover:bg-gold-dark transition-colors">
-              Enquire Now <ArrowRight className="w-4 h-4" />
+            <Link to="/admission" className="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-gold text-secondary-foreground font-semibold hover:bg-gold-dark transition-colors">
+              Apply for Admission <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </section>
