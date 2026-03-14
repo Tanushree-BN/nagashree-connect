@@ -3,9 +3,11 @@ import { User } from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import HeroBanner from "@/components/HeroBanner";
-import { faculties } from "@/data/schoolData";
+import { getFaculties } from "@/lib/store";
 
 const Faculties = () => {
+  const faculties = getFaculties();
+
   return (
     <>
       <SiteHeader />
@@ -21,7 +23,7 @@ const Faculties = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {faculties.map((faculty, i) => (
               <motion.div
-                key={faculty.name}
+                key={faculty.id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

@@ -7,6 +7,7 @@ import logo from "@/assets/logo.png";
 const navLinks = [
   { label: "Home", path: "/" },
   { label: "About", path: "/about" },
+  { label: "Admission", path: "/admission" },
   { label: "Gallery", path: "/gallery" },
   { label: "Faculties", path: "/faculties" },
   { label: "Facilities", path: "/facilities" },
@@ -77,12 +78,6 @@ const SiteHeader = () => {
                 {link.label}
               </Link>
             ))}
-            <Link
-              to="/contact"
-              className="ml-2 px-5 py-2.5 rounded-lg bg-secondary text-secondary-foreground font-semibold text-sm hover:bg-gold-dark transition-colors"
-            >
-              Enquire Now
-            </Link>
           </nav>
 
           {/* Mobile toggle */}
@@ -111,12 +106,6 @@ const SiteHeader = () => {
                 {link.label}
               </Link>
             ))}
-            <Link
-              to="/contact"
-              className="block mt-2 px-4 py-3 rounded-lg bg-secondary text-secondary-foreground font-semibold text-sm text-center"
-            >
-              Enquire Now
-            </Link>
           </nav>
         )}
       </header>

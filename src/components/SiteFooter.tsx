@@ -9,11 +9,9 @@ const SiteFooter = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* About */}
           <div>
-            <h3 className="font-display text-xl font-bold mb-4 text-gold">
-              {contactInfo.schoolName}
-            </h3>
+            <h3 className="font-display text-xl font-bold mb-4 text-gold">{contactInfo.schoolName}</h3>
             <p className="text-primary-foreground/70 text-sm leading-relaxed">
-              Empowering young minds with quality education, strong values, and holistic development since 2009. Your child's bright future starts here.
+              Empowering young minds with quality education, strong values, and holistic development. Your child's bright future starts here.
             </p>
             <div className="flex gap-3 mt-6">
               <a href={contactInfo.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-gold hover:text-secondary-foreground transition-colors" aria-label="Facebook">
@@ -35,15 +33,14 @@ const SiteFooter = () => {
               {[
                 { label: "Home", path: "/" },
                 { label: "About Us", path: "/about" },
+                { label: "Admission", path: "/admission" },
                 { label: "Gallery", path: "/gallery" },
                 { label: "Our Faculty", path: "/faculties" },
                 { label: "Facilities", path: "/facilities" },
                 { label: "Contact", path: "/contact" },
               ].map((link) => (
                 <li key={link.path}>
-                  <Link to={link.path} className="text-primary-foreground/70 hover:text-gold transition-colors text-sm">
-                    {link.label}
-                  </Link>
+                  <Link to={link.path} className="text-primary-foreground/70 hover:text-gold transition-colors text-sm">{link.label}</Link>
                 </li>
               ))}
             </ul>
@@ -66,30 +63,30 @@ const SiteFooter = () => {
               </div>
               <div className="flex gap-3">
                 <Mail className="w-4 h-4 text-gold shrink-0 mt-0.5" />
-                <a href={`mailto:${contactInfo.email}`} className="text-primary-foreground/70 hover:text-gold transition-colors">
-                  {contactInfo.email}
-                </a>
+                <a href={`mailto:${contactInfo.email}`} className="text-primary-foreground/70 hover:text-gold transition-colors">{contactInfo.email}</a>
               </div>
             </div>
           </div>
 
-          {/* Admissions */}
+          {/* Connect */}
           <div>
-            <h4 className="font-display text-lg font-semibold mb-4">Admissions Open</h4>
-            <p className="text-primary-foreground/70 text-sm mb-4">
-              Admissions are now open for the academic year 2025-26. Secure your child's future today.
-            </p>
-            <Link
-              to="/contact"
-              className="inline-block px-6 py-3 rounded-lg bg-gold text-secondary-foreground font-semibold text-sm hover:bg-gold-dark transition-colors"
-            >
-              Apply Now →
-            </Link>
+            <h4 className="font-display text-lg font-semibold mb-4">Connect With Us</h4>
+            <ul className="space-y-2.5 text-sm">
+              <li><a href={contactInfo.socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="text-primary-foreground/70 hover:text-gold transition-colors">YouTube</a></li>
+              <li><a href={contactInfo.socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="text-primary-foreground/70 hover:text-gold transition-colors">Facebook</a></li>
+              <li><a href={contactInfo.socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-primary-foreground/70 hover:text-gold transition-colors">Instagram</a></li>
+            </ul>
           </div>
         </div>
 
         <div className="border-t border-primary-foreground/10 mt-12 pt-8 text-center text-primary-foreground/50 text-sm">
           <p>© {new Date().getFullYear()} {contactInfo.schoolName}. All rights reserved.</p>
+          <p className="mt-2">
+            Designed by{" "}
+            <a href="https://mitrasoftwares.in/" target="_blank" rel="noopener noreferrer" className="text-gold hover:text-gold-light transition-colors">
+              Mitra Softwares
+            </a>
+          </p>
         </div>
       </div>
     </footer>
