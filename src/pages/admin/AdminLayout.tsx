@@ -15,13 +15,13 @@ const AdminLayout = () => {
 
   useEffect(() => {
     if (sessionStorage.getItem("nagashree_admin") !== "true") {
-      navigate("/admin");
+      navigate("/admin/login");
     }
   }, [navigate]);
 
   const handleLogout = () => {
     sessionStorage.removeItem("nagashree_admin");
-    navigate("/admin");
+    navigate("/admin/login");
   };
 
   return (
@@ -50,7 +50,7 @@ const AdminLayout = () => {
         </nav>
         <div className="p-4 space-y-1 border-t border-primary-foreground/10">
           <Link to="/" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-primary-foreground/70 hover:bg-primary-foreground/10 transition-colors">
-            <Home className="w-4 h-4" /> View Website
+            <Home className="w-4 h-4" /> Back to Website
           </Link>
           <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-primary-foreground/70 hover:bg-primary-foreground/10 transition-colors w-full">
             <LogOut className="w-4 h-4" /> Logout

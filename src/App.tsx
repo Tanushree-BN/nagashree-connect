@@ -34,7 +34,7 @@ const App = () => (
           <Route path="/facilities" element={<Facilities />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admission" element={<Admission />} />
-          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<AdminGallery />} />
             <Route path="gallery" element={<AdminGallery />} />
