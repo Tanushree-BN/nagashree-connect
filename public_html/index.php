@@ -53,7 +53,7 @@ $galleryImages = array_slice(get_gallery_images(), 0, 4);
         <div>
           <span class="text-gold font-semibold text-sm uppercase tracking-widest">What We Offer</span>
           <h2 class="section-title mt-3 mb-6">Quality Education & Holistic Growth</h2>
-          <p class="text-muted-foreground leading-relaxed mb-6">On her way she met a copy. The copy warned the Little Blind Text, that where it came from it would have been rewritten a thousand times and everything that was left from its origin would be the word.</p>
+          <p class="text-muted-foreground leading-relaxed mb-6">Quality education supports students' academic and social development. It provides a positive learning environment where students gain knowledge, build important skills, and grow with confidence. Holistic growth helps them develop creativity, critical thinking, discipline, and strong values for the future.</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <?php foreach ($offerings as $item): ?>
               <div class="flex items-start gap-3">
