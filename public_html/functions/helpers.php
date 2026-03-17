@@ -161,7 +161,7 @@ function get_default_gallery_items(): array
         ['src' => '/assets/images/std29.JPG', 'alt' => 'Students in school assembly', 'category' => 'events', 'title' => 'Morning Assembly'],
         ['src' => '/assets/images/clg1.JPG', 'alt' => 'School bus fleet in campus', 'category' => 'facilities', 'title' => 'Transport Fleet'],
         ['src' => '/assets/images/std5.JPG', 'alt' => 'Students participating in school activity', 'category' => 'classroom', 'title' => 'Group Activity'],
-        ['src' => '/assets/images/sp3.JPG', 'alt' => 'Students playing outdoors', 'category' => 'sports', 'title' => 'Outdoor Games'],
+        ['src' => '/assets/images/std6.JPG', 'alt' => 'Students playing outdoors', 'category' => 'sports', 'title' => 'Outdoor Games'],
         ['src' => '/assets/images/std21.JPG', 'alt' => 'Students walking in school corridor', 'category' => 'facilities', 'title' => 'School Corridors'],
         ['src' => '/assets/images/RKP_0685.JPG', 'alt' => 'Aerial view of students in assembly', 'category' => 'events', 'title' => 'School Assembly'],
         ['src' => '/assets/images/std2.jpg', 'alt' => 'Students engaged in classroom learning', 'category' => 'classroom', 'title' => 'Interactive Learning'],
@@ -265,26 +265,50 @@ function bootstrap_database(): void
         }
     }
 
-    $facultyStmt = $pdo->query('SELECT COUNT(*) AS total FROM faculties');
-    $facultyCount = (int) ($facultyStmt->fetch()['total'] ?? 0);
-    if ($facultyCount === 0) {
-        $insertFaculty = $pdo->prepare('INSERT INTO faculties (name, role, subject, experience, image) VALUES (?, ?, ?, ?, ?)');
-        foreach (get_default_faculties() as $faculty) {
-            $insertFaculty->execute([$faculty['name'], $faculty['role'], $faculty['subject'], $faculty['experience'], $faculty['image']]);
-        }
-    }
 }
 
 function get_gallery_images(): array
 {
     $pdo = get_db_connection();
     if (!$pdo) {
-        $fallback = array_map(static function ($item, $index) {
-            $item['id'] = $index + 1;
-            return $item;
-        }, get_default_gallery_items(), array_keys(get_default_gallery_items()));
+        $hiddenSrcs = storage_read('gallery_hidden_seeds'); // array of src strings hidden by admin
 
-        return array_slice($fallback, 0, MAX_GALLERY_IMAGES);
+        $defaults = array_values(array_filter(
+            array_map(static function ($item, $index) {
+                return [
+                    'id' => $index + 1,
+                    'src' => (string) ($item['src'] ?? ''),
+                    'alt' => (string) ($item['alt'] ?? ''),
+                    'category' => (string) ($item['category'] ?? 'events'),
+                    'title' => (string) ($item['title'] ?? ''),
+                ];
+            }, get_default_gallery_items(), array_keys(get_default_gallery_items())),
+            static function ($item) use ($hiddenSrcs) {
+                return !in_array($item['src'], $hiddenSrcs, true);
+            }
+        ));
+
+        $stored = storage_read('gallery_images');
+        $normalizedStored = array_map(static function ($item) {
+            return [
+                'id' => (int) ($item['id'] ?? 0),
+                'src' => (string) ($item['src'] ?? ''),
+                'alt' => (string) ($item['alt'] ?? ''),
+                'category' => (string) ($item['category'] ?? 'events'),
+                'title' => (string) ($item['title'] ?? ''),
+            ];
+        }, $stored);
+
+        $merged = [];
+        foreach (array_merge($normalizedStored, $defaults) as $item) {
+            $key = strtolower(trim($item['src'])) . '|' . strtolower(trim($item['title'])) . '|' . strtolower(trim($item['category'])) . '|' . strtolower(trim($item['alt']));
+            if (isset($merged[$key])) {
+                continue;
+            }
+            $merged[$key] = $item;
+        }
+
+        return array_slice(array_values($merged), 0, MAX_GALLERY_IMAGES);
     }
 
     $stmt = $pdo->query('SELECT id, src, alt_text, category, title FROM gallery_images ORDER BY id DESC');
@@ -305,10 +329,21 @@ function get_faculties(): array
 {
     $pdo = get_db_connection();
     if (!$pdo) {
-        return array_map(static function ($item, $index) {
-            $item['id'] = $index + 1;
-            return $item;
-        }, get_default_faculties(), array_keys(get_default_faculties()));
+        $stored = storage_read('faculties');
+        if (!empty($stored)) {
+            return array_map(static function ($item) {
+                return [
+                    'id' => (int) ($item['id'] ?? 0),
+                    'name' => (string) ($item['name'] ?? ''),
+                    'role' => (string) ($item['role'] ?? ''),
+                    'subject' => (string) ($item['subject'] ?? ''),
+                    'experience' => (string) ($item['experience'] ?? ''),
+                    'image' => (string) ($item['image'] ?? ''),
+                ];
+            }, $stored);
+        }
+
+        return [];
     }
 
     $stmt = $pdo->query('SELECT id, name, role, subject, experience, image FROM faculties ORDER BY id DESC');

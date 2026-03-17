@@ -98,6 +98,23 @@ document.addEventListener('DOMContentLoaded', function() {
   const pickBtn = document.getElementById('gallery-pick-btn');
   const preview = document.getElementById('gallery-preview');
 
+  const postToApi = async function(data) {
+    const response = await fetch(window.appUrl('/api/update-data.php'), { method: 'POST', body: data });
+    const rawText = await response.text();
+    let parsed = null;
+    try {
+      parsed = rawText ? JSON.parse(rawText) : null;
+    } catch (error) {
+      throw new Error(rawText || 'Invalid server response');
+    }
+
+    if (!response.ok || !parsed || parsed.success !== true) {
+      throw new Error((parsed && parsed.message) || `Request failed (${response.status})`);
+    }
+
+    return parsed;
+  };
+
   const setPreview = function(value) {
     if (!preview) return;
     if (value) {
@@ -178,15 +195,13 @@ document.addEventListener('DOMContentLoaded', function() {
       fileInput && fileInput.click();
       return;
     }
-    const data = new FormData(form);
-    data.append('action', idInput.value ? 'update_gallery' : 'add_gallery');
-    const result = await fetch(window.appUrl('/api/update-data.php'), { method: 'POST', body: data }).then((r) => r.json());
-    if (result.success) {
+    try {
+      const data = new FormData(form);
+      data.append('action', idInput.value ? 'update_gallery' : 'add_gallery');
+      await postToApi(data);
       location.reload();
-      return;
-    }
-    if (result.message) {
-      alert(result.message);
+    } catch (error) {
+      alert(error && error.message ? error.message : 'Server error');
     }
   });
 
@@ -210,11 +225,15 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('[data-delete-gallery]').forEach((button) => {
     button.addEventListener('click', async function() {
       if (!confirm('Delete this image?')) return;
-      const data = new FormData();
-      data.append('action', 'delete_gallery');
-      data.append('id', button.getAttribute('data-delete-gallery'));
-      const result = await fetch(window.appUrl('/api/update-data.php'), { method: 'POST', body: data }).then((r) => r.json());
-      if (result.success) location.reload();
+      try {
+        const data = new FormData();
+        data.append('action', 'delete_gallery');
+        data.append('id', button.getAttribute('data-delete-gallery'));
+        await postToApi(data);
+        location.reload();
+      } catch (error) {
+        alert(error && error.message ? error.message : 'Server error');
+      }
     });
   });
 });

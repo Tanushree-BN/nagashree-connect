@@ -11,6 +11,50 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $action = $_POST['action'] ?? '';
 $pdo = get_db_connection();
 
+function save_data_url_image(string $value, string $prefix = 'upload'): string
+{
+    if (!preg_match('/^data:image\/(jpeg|jpg|png|gif|webp);base64,(.+)$/i', $value, $matches)) {
+        throw new RuntimeException('Invalid image format');
+    }
+
+    $extension = strtolower($matches[1]);
+    if ($extension === 'jpeg') {
+        $extension = 'jpg';
+    }
+
+    $binary = base64_decode($matches[2], true);
+    if ($binary === false) {
+        throw new RuntimeException('Invalid image data');
+    }
+
+    $uploadDirectory = __DIR__ . '/../assets/images/uploads';
+    if (!is_dir($uploadDirectory) && !@mkdir($uploadDirectory, 0775, true)) {
+        throw new RuntimeException('Unable to create upload directory');
+    }
+
+    $filename = sprintf('%s_%s_%s.%s', $prefix, date('Ymd_His'), bin2hex(random_bytes(4)), $extension);
+    $filePath = $uploadDirectory . '/' . $filename;
+    if (@file_put_contents($filePath, $binary) === false) {
+        throw new RuntimeException('Unable to save image');
+    }
+
+    return app_url('/assets/images/uploads/' . $filename);
+}
+
+function normalize_image_path(?string $rawValue, string $prefix): string
+{
+    $value = trim((string) $rawValue);
+    if ($value === '') {
+        return '';
+    }
+
+    if (starts_with($value, 'data:image/')) {
+        return save_data_url_image($value, $prefix);
+    }
+
+    return $value;
+}
+
 try {
     switch ($action) {
         case 'create_message': {
@@ -102,8 +146,18 @@ try {
             }
 
             if ($action === 'add_gallery') {
-                $countStmt = $pdo->query('SELECT COUNT(*) AS total FROM gallery_images');
-                $galleryCount = (int) ($countStmt->fetch()['total'] ?? 0);
+                $src = normalize_image_path($_POST['src'] ?? '', 'gallery');
+                if ($src === '') {
+                    throw new RuntimeException('Image is required');
+                }
+
+                if ($pdo) {
+                    $countStmt = $pdo->query('SELECT COUNT(*) AS total FROM gallery_images');
+                    $galleryCount = (int) ($countStmt->fetch()['total'] ?? 0);
+                } else {
+                    $galleryCount = count(get_gallery_images());
+                }
+
                 if ($galleryCount >= MAX_GALLERY_IMAGES) {
                     http_response_code(400);
                     echo json_encode([
@@ -113,57 +167,174 @@ try {
                     exit;
                 }
 
-                $stmt = $pdo->prepare('INSERT INTO gallery_images (src, alt_text, category, title) VALUES (?, ?, ?, ?)');
-                $stmt->execute([
-                    trim($_POST['src'] ?? ''),
-                    trim($_POST['alt'] ?? ''),
-                    trim($_POST['category'] ?? 'events'),
-                    trim($_POST['title'] ?? ''),
-                ]);
+                if ($pdo) {
+                    $stmt = $pdo->prepare('INSERT INTO gallery_images (src, alt_text, category, title) VALUES (?, ?, ?, ?)');
+                    $stmt->execute([
+                        $src,
+                        trim($_POST['alt'] ?? ''),
+                        trim($_POST['category'] ?? 'events'),
+                        trim($_POST['title'] ?? ''),
+                    ]);
+                } else {
+                    $gallery = storage_read('gallery_images');
+                    $gallery[] = [
+                        'id' => (int) round(microtime(true) * 1000),
+                        'src' => $src,
+                        'alt' => trim($_POST['alt'] ?? ''),
+                        'category' => trim($_POST['category'] ?? 'events'),
+                        'title' => trim($_POST['title'] ?? ''),
+                    ];
+
+                    if (!storage_write('gallery_images', $gallery)) {
+                        throw new RuntimeException('Unable to store gallery image');
+                    }
+                }
             }
 
             if ($action === 'update_gallery') {
-                $stmt = $pdo->prepare('UPDATE gallery_images SET src = ?, alt_text = ?, category = ?, title = ? WHERE id = ?');
-                $stmt->execute([
-                    trim($_POST['src'] ?? ''),
-                    trim($_POST['alt'] ?? ''),
-                    trim($_POST['category'] ?? 'events'),
-                    trim($_POST['title'] ?? ''),
-                    (int) ($_POST['id'] ?? 0),
-                ]);
+                $src = normalize_image_path($_POST['src'] ?? '', 'gallery');
+
+                if ($pdo) {
+                    $stmt = $pdo->prepare('UPDATE gallery_images SET src = ?, alt_text = ?, category = ?, title = ? WHERE id = ?');
+                    $stmt->execute([
+                        $src,
+                        trim($_POST['alt'] ?? ''),
+                        trim($_POST['category'] ?? 'events'),
+                        trim($_POST['title'] ?? ''),
+                        (int) ($_POST['id'] ?? 0),
+                    ]);
+                } else {
+                    $id = (int) ($_POST['id'] ?? 0);
+                    $gallery = storage_read('gallery_images');
+                    foreach ($gallery as &$item) {
+                        if ((int) ($item['id'] ?? 0) === $id) {
+                            $item['src'] = $src;
+                            $item['alt'] = trim($_POST['alt'] ?? '');
+                            $item['category'] = trim($_POST['category'] ?? 'events');
+                            $item['title'] = trim($_POST['title'] ?? '');
+                        }
+                    }
+                    unset($item);
+
+                    if (!storage_write('gallery_images', $gallery)) {
+                        throw new RuntimeException('Unable to update gallery image');
+                    }
+                }
             }
 
             if ($action === 'delete_gallery') {
-                $stmt = $pdo->prepare('DELETE FROM gallery_images WHERE id = ?');
-                $stmt->execute([(int) ($_POST['id'] ?? 0)]);
+                if ($pdo) {
+                    $stmt = $pdo->prepare('DELETE FROM gallery_images WHERE id = ?');
+                    $stmt->execute([(int) ($_POST['id'] ?? 0)]);
+                } else {
+                    $id = (int) ($_POST['id'] ?? 0);
+                    $defaultItems = get_default_gallery_items();
+                    $seededSrc = null;
+
+                    // Seeded items have IDs 1..N (index+1); timestamps are always much larger
+                    if ($id >= 1 && $id <= count($defaultItems)) {
+                        $seededSrc = $defaultItems[$id - 1]['src'] ?? null;
+                    }
+
+                    if ($seededSrc !== null) {
+                        // Hide this seeded image so it no longer appears
+                        $hidden = storage_read('gallery_hidden_seeds');
+                        if (!in_array($seededSrc, $hidden, true)) {
+                            $hidden[] = $seededSrc;
+                        }
+
+                        if (!storage_write('gallery_hidden_seeds', $hidden)) {
+                            throw new RuntimeException('Unable to remove gallery image');
+                        }
+                    } else {
+                        // Delete user-uploaded image from storage
+                        $gallery = array_values(array_filter(storage_read('gallery_images'), static function ($item) use ($id) {
+                            return (int) ($item['id'] ?? 0) !== $id;
+                        }));
+
+                        if (!storage_write('gallery_images', $gallery)) {
+                            throw new RuntimeException('Unable to delete gallery image');
+                        }
+                    }
+                }
             }
 
             if ($action === 'add_faculty') {
-                $stmt = $pdo->prepare('INSERT INTO faculties (name, role, subject, experience, image) VALUES (?, ?, ?, ?, ?)');
-                $stmt->execute([
-                    trim($_POST['name'] ?? ''),
-                    trim($_POST['role'] ?? ''),
-                    trim($_POST['subject'] ?? ''),
-                    trim($_POST['experience'] ?? ''),
-                    trim($_POST['image'] ?? ''),
-                ]);
+                $image = normalize_image_path($_POST['image'] ?? '', 'faculty');
+
+                if ($pdo) {
+                    $stmt = $pdo->prepare('INSERT INTO faculties (name, role, subject, experience, image) VALUES (?, ?, ?, ?, ?)');
+                    $stmt->execute([
+                        trim($_POST['name'] ?? ''),
+                        trim($_POST['role'] ?? ''),
+                        trim($_POST['subject'] ?? ''),
+                        trim($_POST['experience'] ?? ''),
+                        $image,
+                    ]);
+                } else {
+                    $faculties = storage_read('faculties');
+                    $faculties[] = [
+                        'id' => (int) round(microtime(true) * 1000),
+                        'name' => trim($_POST['name'] ?? ''),
+                        'role' => trim($_POST['role'] ?? ''),
+                        'subject' => trim($_POST['subject'] ?? ''),
+                        'experience' => trim($_POST['experience'] ?? ''),
+                        'image' => $image,
+                    ];
+
+                    if (!storage_write('faculties', $faculties)) {
+                        throw new RuntimeException('Unable to store faculty');
+                    }
+                }
             }
 
             if ($action === 'update_faculty') {
-                $stmt = $pdo->prepare('UPDATE faculties SET name = ?, role = ?, subject = ?, experience = ?, image = ? WHERE id = ?');
-                $stmt->execute([
-                    trim($_POST['name'] ?? ''),
-                    trim($_POST['role'] ?? ''),
-                    trim($_POST['subject'] ?? ''),
-                    trim($_POST['experience'] ?? ''),
-                    trim($_POST['image'] ?? ''),
-                    (int) ($_POST['id'] ?? 0),
-                ]);
+                $image = normalize_image_path($_POST['image'] ?? '', 'faculty');
+
+                if ($pdo) {
+                    $stmt = $pdo->prepare('UPDATE faculties SET name = ?, role = ?, subject = ?, experience = ?, image = ? WHERE id = ?');
+                    $stmt->execute([
+                        trim($_POST['name'] ?? ''),
+                        trim($_POST['role'] ?? ''),
+                        trim($_POST['subject'] ?? ''),
+                        trim($_POST['experience'] ?? ''),
+                        $image,
+                        (int) ($_POST['id'] ?? 0),
+                    ]);
+                } else {
+                    $id = (int) ($_POST['id'] ?? 0);
+                    $faculties = storage_read('faculties');
+                    foreach ($faculties as &$faculty) {
+                        if ((int) ($faculty['id'] ?? 0) === $id) {
+                            $faculty['name'] = trim($_POST['name'] ?? '');
+                            $faculty['role'] = trim($_POST['role'] ?? '');
+                            $faculty['subject'] = trim($_POST['subject'] ?? '');
+                            $faculty['experience'] = trim($_POST['experience'] ?? '');
+                            $faculty['image'] = $image;
+                        }
+                    }
+                    unset($faculty);
+
+                    if (!storage_write('faculties', $faculties)) {
+                        throw new RuntimeException('Unable to update faculty');
+                    }
+                }
             }
 
             if ($action === 'delete_faculty') {
-                $stmt = $pdo->prepare('DELETE FROM faculties WHERE id = ?');
-                $stmt->execute([(int) ($_POST['id'] ?? 0)]);
+                if ($pdo) {
+                    $stmt = $pdo->prepare('DELETE FROM faculties WHERE id = ?');
+                    $stmt->execute([(int) ($_POST['id'] ?? 0)]);
+                } else {
+                    $id = (int) ($_POST['id'] ?? 0);
+                    $faculties = array_values(array_filter(storage_read('faculties'), static function ($faculty) use ($id) {
+                        return (int) ($faculty['id'] ?? 0) !== $id;
+                    }));
+
+                    if (!storage_write('faculties', $faculties)) {
+                        throw new RuntimeException('Unable to delete faculty');
+                    }
+                }
             }
 
             if ($action === 'mark_message_seen') {
@@ -236,5 +407,9 @@ try {
     }
 } catch (Throwable $throwable) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Server error']);
+    $message = 'Server error';
+    if (is_admin_logged_in() && trim($throwable->getMessage()) !== '') {
+        $message = $throwable->getMessage();
+    }
+    echo json_encode(['success' => false, 'message' => $message]);
 }

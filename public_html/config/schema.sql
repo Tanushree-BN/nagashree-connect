@@ -65,4 +65,4 @@ CREATE TABLE IF NOT EXISTS admissions (
 --    username: admin
 --    password: admin123
 --    if admin_users is empty.
--- 3) It also auto-seeds default gallery/faculty data if those tables are empty.
+-- 3) It also auto-seeds default gallery photos if gallery_images is empty.
