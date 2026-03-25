@@ -12,7 +12,7 @@ $unseen = count(array_filter($admissions, static fn($a) => (int) $a['seen'] === 
 ?>
 <div class="min-h-screen bg-muted flex admin-layout-mobile-stack">
   <?php include __DIR__ . '/../includes/sidebar.php'; ?>
-  <main class="flex-1 p-8 overflow-auto">
+  <main class="flex-1 p-8 overflow-auto admin-main-content">
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="font-display text-2xl font-bold text-foreground">Admission Forms</h1>
@@ -33,15 +33,15 @@ $unseen = count(array_filter($admissions, static fn($a) => (int) $a['seen'] === 
             <div class="px-5 pb-5 border-t border-border pt-4 text-sm">
               <div class="grid sm:grid-cols-2 gap-3">
                 <div><span class="text-muted-foreground">Student Name:</span> <span class="text-foreground font-medium"><?= h($form['student_name']) ?></span></div>
-                <div><span class="text-muted-foreground">Parent/Guardian:</span> <span class="text-foreground font-medium"><?= h($form['parent_name']) ?></span></div>
+                <div><span class="text-muted-foreground">Father's Name:</span> <span class="text-foreground font-medium"><?= h($form['parent_name']) ?></span></div>
+                <div><span class="text-muted-foreground">Mother's Name:</span> <span class="text-foreground font-medium"><?= h($form['mother_name'] ?? 'N/A') ?></span></div>
                 <div><span class="text-muted-foreground">Date of Birth:</span> <span class="text-foreground font-medium"><?= h($form['dob']) ?></span></div>
                 <div><span class="text-muted-foreground">Gender:</span> <span class="text-foreground font-medium"><?= h($form['gender']) ?></span></div>
                 <div><span class="text-muted-foreground">Class Applied:</span> <span class="text-foreground font-medium"><?= h($form['class_applying']) ?></span></div>
-                <div><span class="text-muted-foreground">Phone:</span> <span class="text-foreground font-medium"><?= h($form['phone']) ?></span></div>
+                <div><span class="text-muted-foreground">Father's Phone:</span> <span class="text-foreground font-medium"><?= h($form['phone']) ?></span></div>
+                <div><span class="text-muted-foreground">Mother's Phone:</span> <span class="text-foreground font-medium"><?= h($form['mother_phone'] ?? 'N/A') ?></span></div>
                 <div><span class="text-muted-foreground">Email:</span> <span class="text-foreground font-medium"><?= h($form['email'] ?: 'N/A') ?></span></div>
                 <div><span class="text-muted-foreground">Previous School:</span> <span class="text-foreground font-medium"><?= h($form['previous_school'] ?: 'N/A') ?></span></div>
-                <div><span class="text-muted-foreground">Previous Grade:</span> <span class="text-foreground font-medium"><?= h($form['previous_grade'] ?: 'N/A') ?></span></div>
-                <div><span class="text-muted-foreground">Aadhaar:</span> <span class="text-foreground font-medium"><?= h($form['aadhaar'] ?: 'N/A') ?></span></div>
               </div>
               <div class="mt-3"><span class="text-muted-foreground">Address:</span> <span class="text-foreground"><?= h($form['address']) ?></span></div>
               <?php if ((int) $form['seen'] === 0): ?><button data-mark-admission="<?= h((string) $form['id']) ?>" class="mt-2 text-gold text-sm font-medium hover:text-gold-dark">Mark as read</button><?php endif; ?>
@@ -64,16 +64,16 @@ document.addEventListener('DOMContentLoaded', function() {
       doc.setFontSize(11);
       const fields = [
         ['Student Name', form.student_name],
-        ['Parent/Guardian', form.parent_name],
+        ["Father's Name", form.parent_name],
+        ["Mother's Name", form.mother_name || 'N/A'],
         ['Date of Birth', form.dob],
         ['Gender', form.gender],
         ['Class Applied', form.class_applying],
-        ['Phone', form.phone],
+        ["Father's Phone", form.phone],
+        ["Mother's Phone", form.mother_phone || 'N/A'],
         ['Email', form.email || 'N/A'],
         ['Address', form.address],
         ['Previous School', form.previous_school || 'N/A'],
-        ['Previous Grade', form.previous_grade || 'N/A'],
-        ['Aadhaar', form.aadhaar || 'N/A'],
         ['Submitted On', form.created_at]
       ];
       let y = 35;

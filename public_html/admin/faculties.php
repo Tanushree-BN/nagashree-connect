@@ -11,7 +11,7 @@ $list = get_faculties();
 ?>
 <div class="min-h-screen bg-muted flex admin-layout-mobile-stack">
   <?php include __DIR__ . '/../includes/sidebar.php'; ?>
-  <main class="flex-1 p-8 overflow-auto">
+  <main class="flex-1 p-8 overflow-auto admin-main-content">
     <div class="flex items-center justify-between mb-6"><h1 class="font-display text-2xl font-bold text-foreground">Faculty Management</h1></div>
 
     <form id="faculty-form" class="bg-card rounded-xl p-6 border border-border mb-6 space-y-4">
@@ -40,25 +40,56 @@ $list = get_faculties();
     </form>
 
     <div class="bg-card rounded-xl border border-border overflow-hidden">
-      <table class="w-full text-sm">
-        <thead class="bg-muted"><tr><th class="text-left px-4 py-3 text-muted-foreground font-medium">Pic</th><th class="text-left px-4 py-3 text-muted-foreground font-medium">Name</th><th class="text-left px-4 py-3 text-muted-foreground font-medium">Role</th><th class="text-left px-4 py-3 text-muted-foreground font-medium">Subject</th><th class="text-left px-4 py-3 text-muted-foreground font-medium">Experience</th><th class="text-right px-4 py-3 text-muted-foreground font-medium">Actions</th></tr></thead>
-        <tbody class="divide-y divide-border">
+      <?php if (count($list) === 0): ?>
+        <p class="text-center py-8 text-muted-foreground">No faculty members yet.</p>
+      <?php else: ?>
+        <div class="md:hidden p-4 space-y-3">
           <?php foreach ($list as $faculty): ?>
-            <tr class="hover:bg-muted/50">
-              <td class="px-4 py-3"><?php if (!empty($faculty['image'])): ?><img src="<?= h($faculty['image']) ?>" alt="<?= h($faculty['name']) ?>" class="w-10 h-10 rounded-full object-cover bg-muted" /><?php else: ?><div class="w-10 h-10 rounded-full bg-muted flex items-center justify-center"><i data-lucide="user" class="w-5 h-5 text-muted-foreground"></i></div><?php endif; ?></td>
-              <td class="px-4 py-3 text-foreground font-medium"><?= h($faculty['name']) ?></td>
-              <td class="px-4 py-3 text-gold"><?= h($faculty['role']) ?></td>
-              <td class="px-4 py-3 text-muted-foreground"><?= h($faculty['subject']) ?></td>
-              <td class="px-4 py-3 text-muted-foreground"><?= h($faculty['experience']) ?></td>
-              <td class="px-4 py-3 text-right">
-                <button data-edit-faculty='<?= h(json_encode($faculty, JSON_HEX_APOS | JSON_HEX_QUOT)) ?>' class="p-1.5 rounded text-muted-foreground hover:text-gold"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-                <button data-delete-faculty="<?= h((string) $faculty['id']) ?>" class="p-1.5 rounded text-muted-foreground hover:text-destructive"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-              </td>
-            </tr>
+            <article class="rounded-lg border border-border bg-background p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <?php if (!empty($faculty['image'])): ?>
+                    <img src="<?= h($faculty['image']) ?>" alt="<?= h($faculty['name']) ?>" class="w-12 h-12 rounded-full object-cover bg-muted" width="48" height="48" loading="lazy" decoding="async" />
+                  <?php else: ?>
+                    <div class="w-12 h-12 rounded-full bg-muted flex items-center justify-center"><i data-lucide="user" class="w-5 h-5 text-muted-foreground"></i></div>
+                  <?php endif; ?>
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-foreground truncate"><?= h($faculty['name']) ?></p>
+                    <p class="text-xs text-gold mt-0.5"><?= h($faculty['role']) ?></p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1 shrink-0">
+                  <button data-edit-faculty="1" data-faculty-id="<?= h((string) ($faculty['id'] ?? '')) ?>" data-faculty-name="<?= h((string) ($faculty['name'] ?? '')) ?>" data-faculty-role="<?= h((string) ($faculty['role'] ?? '')) ?>" data-faculty-subject="<?= h((string) ($faculty['subject'] ?? '')) ?>" data-faculty-experience="<?= h((string) ($faculty['experience'] ?? '')) ?>" data-faculty-image="<?= h((string) ($faculty['image'] ?? '')) ?>" class="p-1.5 rounded text-muted-foreground hover:text-gold"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                  <button data-delete-faculty="<?= h((string) $faculty['id']) ?>" class="p-1.5 rounded text-muted-foreground hover:text-destructive"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+              </div>
+              <div class="mt-3 grid grid-cols-1 gap-1 text-sm">
+                <p><span class="text-muted-foreground">Subject:</span> <span class="text-foreground"><?= h($faculty['subject']) ?></span></p>
+                <p><span class="text-muted-foreground">Experience:</span> <span class="text-foreground"><?= h($faculty['experience']) ?></span></p>
+              </div>
+            </article>
           <?php endforeach; ?>
-        </tbody>
-      </table>
-      <?php if (count($list) === 0): ?><p class="text-center py-8 text-muted-foreground">No faculty members yet.</p><?php endif; ?>
+        </div>
+
+        <table class="hidden md:table w-full text-sm">
+          <thead class="bg-muted"><tr><th class="text-left px-4 py-3 text-muted-foreground font-medium">Pic</th><th class="text-left px-4 py-3 text-muted-foreground font-medium">Name</th><th class="text-left px-4 py-3 text-muted-foreground font-medium">Role</th><th class="text-left px-4 py-3 text-muted-foreground font-medium">Subject</th><th class="text-left px-4 py-3 text-muted-foreground font-medium">Experience</th><th class="text-right px-4 py-3 text-muted-foreground font-medium">Actions</th></tr></thead>
+          <tbody class="divide-y divide-border">
+            <?php foreach ($list as $faculty): ?>
+              <tr class="hover:bg-muted/50">
+                <td class="px-4 py-3"><?php if (!empty($faculty['image'])): ?><img src="<?= h($faculty['image']) ?>" alt="<?= h($faculty['name']) ?>" class="w-10 h-10 rounded-full object-cover bg-muted" width="40" height="40" loading="lazy" decoding="async" /><?php else: ?><div class="w-10 h-10 rounded-full bg-muted flex items-center justify-center"><i data-lucide="user" class="w-5 h-5 text-muted-foreground"></i></div><?php endif; ?></td>
+                <td class="px-4 py-3 text-foreground font-medium"><?= h($faculty['name']) ?></td>
+                <td class="px-4 py-3 text-gold"><?= h($faculty['role']) ?></td>
+                <td class="px-4 py-3 text-muted-foreground"><?= h($faculty['subject']) ?></td>
+                <td class="px-4 py-3 text-muted-foreground"><?= h($faculty['experience']) ?></td>
+                <td class="px-4 py-3 text-right">
+                  <button data-edit-faculty="1" data-faculty-id="<?= h((string) ($faculty['id'] ?? '')) ?>" data-faculty-name="<?= h((string) ($faculty['name'] ?? '')) ?>" data-faculty-role="<?= h((string) ($faculty['role'] ?? '')) ?>" data-faculty-subject="<?= h((string) ($faculty['subject'] ?? '')) ?>" data-faculty-experience="<?= h((string) ($faculty['experience'] ?? '')) ?>" data-faculty-image="<?= h((string) ($faculty['image'] ?? '')) ?>" class="p-1.5 rounded text-muted-foreground hover:text-gold"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                  <button data-delete-faculty="<?= h((string) $faculty['id']) ?>" class="p-1.5 rounded text-muted-foreground hover:text-destructive"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      <?php endif; ?>
     </div>
   </main>
 </div>
@@ -184,14 +215,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.querySelectorAll('[data-edit-faculty]').forEach((button) => {
     button.addEventListener('click', function() {
-      const row = JSON.parse(button.getAttribute('data-edit-faculty'));
-      idInput.value = row.id;
-      form.querySelector('[name="name"]').value = row.name || '';
-      form.querySelector('[name="role"]').value = row.role || '';
-      form.querySelector('[name="subject"]').value = row.subject || '';
-      form.querySelector('[name="experience"]').value = row.experience || '';
-      imageInput.value = row.image || '';
-      setPreview(row.image || '');
+      const id = button.getAttribute('data-faculty-id') || '';
+      const name = button.getAttribute('data-faculty-name') || '';
+      const role = button.getAttribute('data-faculty-role') || '';
+      const subject = button.getAttribute('data-faculty-subject') || '';
+      const experience = button.getAttribute('data-faculty-experience') || '';
+      const image = button.getAttribute('data-faculty-image') || '';
+
+      idInput.value = id;
+      form.querySelector('[name="name"]').value = name;
+      form.querySelector('[name="role"]').value = role;
+      form.querySelector('[name="subject"]').value = subject;
+      form.querySelector('[name="experience"]').value = experience;
+      imageInput.value = image;
+      setPreview(image);
       formTitle.textContent = 'Edit Faculty';
       submitBtn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Update';
       cancelEditBtn.classList.remove('hidden');

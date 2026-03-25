@@ -1,0 +1,53 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+
+# Security: block internal folders direct access
+RewriteRule ^(config|functions)/ - [F,L]
+
+# Existing files/directories
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# API routes
+RewriteRule ^api/login/?$ api/login.php [L,QSA]
+RewriteRule ^api/register/?$ api/register.php [L,QSA]
+RewriteRule ^api/fetch-data/?$ api/fetch-data.php [L,QSA]
+RewriteRule ^api/update-data/?$ api/update-data.php [L,QSA]
+
+# Admin routes
+RewriteRule ^admin/?$ admin/index.php [L,QSA]
+RewriteRule ^admin/login/?$ admin/login.php [L,QSA]
+RewriteRule ^admin/dashboard/?$ admin/dashboard.php [L,QSA]
+RewriteRule ^admin/gallery/?$ admin/gallery.php [L,QSA]
+RewriteRule ^admin/faculties/?$ admin/faculties.php [L,QSA]
+RewriteRule ^admin/messages/?$ admin/messages.php [L,QSA]
+RewriteRule ^admin/admissions/?$ admin/admissions.php [L,QSA]
+
+# Public routes
+RewriteRule ^about/?$ about.php [L,QSA]
+RewriteRule ^gallery/?$ gallery.php [L,QSA]
+RewriteRule ^faculties/?$ faculties.php [L,QSA]
+RewriteRule ^facilities/?$ facilities.php [L,QSA]
+RewriteRule ^contact/?$ contact.php [L,QSA]
+RewriteRule ^admission/?$ admission.php [L,QSA]
+RewriteRule ^login/?$ login.php [L,QSA]
+RewriteRule ^register/?$ register.php [L,QSA]
+RewriteRule ^dashboard/?$ dashboard.php [L,QSA]
+RewriteRule ^logout/?$ logout.php [L,QSA]
+
+# Home route
+RewriteRule ^$ index.php [L,QSA]
+
+# Fallback 404
+RewriteRule . 404.php [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+Header set X-Frame-Options "SAMEORIGIN"
+Header set X-Content-Type-Options "nosniff"
+Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

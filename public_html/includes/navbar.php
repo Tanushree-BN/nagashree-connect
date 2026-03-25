@@ -31,9 +31,9 @@ $navLinks = [
 </div>
 
 <header id="site-header" class="sticky top-0 z-50 transition-all duration-300 bg-card/95 backdrop-blur-md">
-  <div class="container mx-auto flex items-center justify-between py-3 px-4">
+  <div class="container mx-auto flex items-center justify-between py-3 px-4 mobile-nav-wrap">
     <a href="/" class="flex items-center gap-3">
-      <img src="/assets/images/nag-logo.png" alt="Nagashree English School logo" class="w-12 h-12 object-contain" />
+      <img src="/assets/images/nag-logo.png" alt="Nagashree English School logo" class="w-12 h-12 object-contain" width="48" height="48" loading="eager" />
       <div>
         <span class="font-display font-bold text-lg text-primary leading-tight block">Nagashree English School</span>
         <span class="text-xs text-muted-foreground">Channarayapatna, Hassan</span>
@@ -61,15 +61,15 @@ $navLinks = [
       <?php endif; ?>
     </nav>
 
-    <button id="mobile-menu-toggle" class="lg:hidden p-2 text-foreground" aria-label="Open menu">
+    <button id="mobile-menu-toggle" class="lg:hidden p-2.5 text-foreground rounded-lg border border-border/60 bg-background/70 mobile-menu-btn" aria-label="Open menu">
       <i data-lucide="menu" class="w-6 h-6" id="menu-open-icon"></i>
       <i data-lucide="x" class="w-6 h-6 hidden" id="menu-close-icon"></i>
     </button>
   </div>
 
-  <nav id="mobile-menu" class="lg:hidden border-t border-border bg-card px-4 pb-4 hidden" aria-label="Mobile navigation">
+  <nav id="mobile-menu" class="lg:hidden border-t border-border bg-card px-4 pb-4 hidden mobile-nav-panel" aria-label="Mobile navigation">
     <?php foreach ($navLinks as $link): ?>
-      <a href="<?= h($link['path']) ?>" class="block px-4 py-3 rounded-lg text-sm font-medium transition-colors <?= $currentPath === $link['path'] ? 'bg-secondary text-secondary-foreground' : 'text-foreground hover:bg-muted' ?>">
+      <a href="<?= h($link['path']) ?>" class="block px-4 py-3.5 rounded-lg text-base font-medium transition-colors mobile-nav-link <?= $currentPath === $link['path'] ? 'bg-secondary text-secondary-foreground' : 'text-foreground hover:bg-muted' ?>">
         <?= h($link['label']) ?>
       </a>
     <?php endforeach; ?>

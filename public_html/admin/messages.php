@@ -12,7 +12,7 @@ $unseen = count(array_filter($messages, static fn($m) => (int) $m['seen'] === 0)
 ?>
 <div class="min-h-screen bg-muted flex admin-layout-mobile-stack">
   <?php include __DIR__ . '/../includes/sidebar.php'; ?>
-  <main class="flex-1 p-8 overflow-auto">
+  <main class="flex-1 p-8 overflow-auto admin-main-content">
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="font-display text-2xl font-bold text-foreground">Contact Messages</h1>

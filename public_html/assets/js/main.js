@@ -1,6 +1,53 @@
 document.addEventListener("DOMContentLoaded", function () {
+  var admissionWhatsappPhone = "919901181966";
+  var pendingAdmissionWhatsappUrl = "";
+
   if (window.lucide) {
     window.lucide.createIcons();
+  }
+
+  var admissionPopup = document.getElementById("admission-popup");
+  var admissionPopupClose = document.getElementById("admission-popup-close");
+  if (admissionPopup) {
+    var isClosingAdmissionPopup = false;
+
+    var openAdmissionPopup = function () {
+      admissionPopup.classList.remove("hidden");
+      admissionPopup.classList.add("flex");
+      requestAnimationFrame(function () {
+        admissionPopup.classList.add("popup-visible");
+      });
+    };
+
+    var hasShownAdmissionPopup = sessionStorage.getItem("admissionPopupShown");
+    if (!hasShownAdmissionPopup) {
+      setTimeout(function () {
+        openAdmissionPopup();
+        sessionStorage.setItem("admissionPopupShown", "1");
+      }, 250);
+    }
+
+    var closeAdmissionPopup = function () {
+      if (isClosingAdmissionPopup) return;
+      isClosingAdmissionPopup = true;
+      admissionPopup.classList.remove("popup-visible");
+
+      setTimeout(function () {
+        admissionPopup.classList.add("hidden");
+        admissionPopup.classList.remove("flex");
+        isClosingAdmissionPopup = false;
+      }, 230);
+    };
+
+    if (admissionPopupClose) {
+      admissionPopupClose.addEventListener("click", closeAdmissionPopup);
+    }
+
+    admissionPopup.addEventListener("click", function (event) {
+      if (event.target === admissionPopup) {
+        closeAdmissionPopup();
+      }
+    });
   }
 
   var header = document.getElementById("site-header");
@@ -25,6 +72,14 @@ document.addEventListener("DOMContentLoaded", function () {
       mobileMenu.classList.toggle("hidden");
       menuOpenIcon.classList.toggle("hidden");
       menuCloseIcon.classList.toggle("hidden");
+    });
+  }
+
+  var adminMenuToggle = document.getElementById("admin-menu-toggle");
+  var adminMenuPanel = document.getElementById("admin-menu-panel");
+  if (adminMenuToggle && adminMenuPanel) {
+    adminMenuToggle.addEventListener("click", function () {
+      adminMenuPanel.classList.toggle("hidden");
     });
   }
 
@@ -94,10 +149,93 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   var admissionForm = document.getElementById("admission-form");
+  var admissionOpenButton = document.getElementById("admission-open-btn");
+  var admissionCancelButton = document.getElementById("admission-cancel-btn");
+  var admissionSubmitAnotherButton = document.getElementById(
+    "admission-submit-another-btn",
+  );
+  var admissionWhatsappSendButton = document.getElementById(
+    "admission-whatsapp-send-btn",
+  );
+
+  if (admissionWhatsappSendButton) {
+    admissionWhatsappSendButton.addEventListener("click", function () {
+      if (!pendingAdmissionWhatsappUrl) return;
+      window.location.href = pendingAdmissionWhatsappUrl;
+    });
+  }
+
+  if (admissionSubmitAnotherButton && admissionForm) {
+    admissionSubmitAnotherButton.addEventListener("click", function () {
+      var successBox = document.getElementById("admission-success");
+      var errorBox = document.getElementById("admission-error");
+      if (successBox) {
+        successBox.classList.add("hidden");
+        successBox.classList.remove("block");
+      }
+      if (errorBox) {
+        errorBox.classList.add("hidden");
+        errorBox.classList.remove("flex");
+      }
+      pendingAdmissionWhatsappUrl = "";
+      admissionForm.hidden = false;
+      admissionForm.classList.remove("hidden");
+      var firstInput = admissionForm.querySelector("input, select, textarea");
+      if (firstInput) firstInput.focus();
+      admissionForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  if (admissionOpenButton && admissionForm) {
+    admissionOpenButton.addEventListener("click", function () {
+      admissionForm.hidden = false;
+      admissionForm.classList.remove("hidden");
+      var firstInput = admissionForm.querySelector("input, select, textarea");
+      if (firstInput) firstInput.focus();
+      admissionForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  if (admissionCancelButton && admissionForm) {
+    admissionCancelButton.addEventListener("click", function () {
+      admissionForm.reset();
+      admissionForm.hidden = true;
+      admissionForm.classList.add("hidden");
+
+      var successBox = document.getElementById("admission-success");
+      var errorBox = document.getElementById("admission-error");
+      if (successBox) {
+        successBox.classList.add("hidden");
+        successBox.classList.remove("flex");
+        successBox.classList.remove("block");
+      }
+      if (errorBox) {
+        errorBox.classList.add("hidden");
+        errorBox.classList.remove("flex");
+      }
+    });
+  }
+
   if (admissionForm) {
     admissionForm.addEventListener("submit", async function (event) {
       event.preventDefault();
       var formData = new FormData(admissionForm);
+      var whatsappMessageLines = [
+        "New Admission Enquiry - Nagashree English School",
+        "",
+        "Student Name: " + (formData.get("studentName") || ""),
+        "Father's Name: " + (formData.get("parentName") || ""),
+        "Mother's Name: " + (formData.get("motherName") || "N/A"),
+        "DOB: " + (formData.get("dob") || ""),
+        "Gender: " + (formData.get("gender") || ""),
+        "Class Applying: " + (formData.get("classApplying") || ""),
+        "Father's Phone: " + (formData.get("phone") || ""),
+        "Mother's Phone: " + (formData.get("motherPhone") || "N/A"),
+        "Email: " + (formData.get("email") || "N/A"),
+        "Address: " + (formData.get("address") || ""),
+        "Previous School: " + (formData.get("previousSchool") || "N/A"),
+      ];
+
       formData.append("action", "create_admission");
       var response = await fetch(window.appUrl("/api/update-data.php"), {
         method: "POST",
@@ -113,15 +251,29 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         if (successBox) {
           successBox.classList.remove("hidden");
-          successBox.classList.add("flex");
-        }
-        admissionForm.reset();
-        setTimeout(function () {
-          if (successBox) {
-            successBox.classList.add("hidden");
-            successBox.classList.remove("flex");
+          successBox.classList.add("block");
+          var successText = successBox.querySelector("span");
+          if (successText) {
+            successText.textContent =
+              "Form submitted successfully. We will contact you soon.";
           }
-        }, 6000);
+        }
+
+        pendingAdmissionWhatsappUrl =
+          "https://wa.me/" +
+          admissionWhatsappPhone +
+          "?text=" +
+          encodeURIComponent(whatsappMessageLines.join("\n"));
+
+        admissionForm.hidden = true;
+        admissionForm.classList.add("hidden");
+        admissionForm.reset();
+
+        if (successBox) {
+          setTimeout(function () {
+            successBox.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 80);
+        }
       } else if (errorBox) {
         var errorText = errorBox.querySelector("span");
         if (errorText && data.message) {

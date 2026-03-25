@@ -1,0 +1,53 @@
+:root {
+  --background: 40 33% 98%;
+  --foreground: 220 30% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 30% 15%;
+  --primary: 220 45% 20%;
+  --primary-foreground: 40 33% 98%;
+  --secondary: 38 92% 55%;
+  --secondary-foreground: 220 45% 12%;
+  --muted: 40 20% 94%;
+  --muted-foreground: 220 10% 46%;
+  --accent: 38 92% 55%;
+  --accent-foreground: 220 45% 12%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 40 15% 88%;
+  --input: 40 15% 88%;
+  --ring: 38 92% 55%;
+  --radius: .75rem;
+  --navy: 220 45% 20%;
+  --navy-light: 220 35% 30%;
+  --navy-dark: 220 50% 12%;
+  --gold: 38 92% 55%;
+  --gold-light: 38 85% 70%;
+  --gold-dark: 38 90% 42%;
+  --shadow-soft: 0 4px 20px -4px hsl(220 30% 15% / 0.08);
+  --shadow-elevated: 0 20px 60px -15px hsl(220 30% 15% / 0.15);
+  --gradient-navy: linear-gradient(135deg, hsl(220 50% 12%), hsl(220 45% 22%));
+}
+
+* { border-color: hsl(var(--border)); }
+body { font-family: 'Inter', sans-serif; }
+h1,h2,h3,h4,h5,h6 { font-family: 'Playfair Display', serif; }
+
+.section-padding { padding: 4rem 1rem; }
+@media (min-width: 768px) {
+  .section-padding { padding-top: 6rem; padding-bottom: 6rem; }
+}
+.section-title { font-family: 'Playfair Display', serif; font-size: 1.875rem; line-height: 1.2; font-weight: 700; color: hsl(var(--primary)); }
+@media (min-width: 768px) { .section-title { font-size: 2.25rem; } }
+@media (min-width: 1024px) { .section-title { font-size: 3rem; } }
+.section-subtitle { color: hsl(var(--muted-foreground)); font-size: 1.125rem; margin-top: 1rem; max-width: 42rem; }
+.gradient-navy { background: var(--gradient-navy); }
+.card-hover { transition: all .3s; box-shadow: var(--shadow-soft); }
+.card-hover:hover { box-shadow: var(--shadow-elevated); transform: translateY(-4px); }
+
+.stat-value { font-family: 'Playfair Display', serif; }
+
+#site-header.scrolled { background-color: hsl(var(--card)); box-shadow: 0 10px 20px -10px rgba(0,0,0,.2); }
+
+@media (max-width: 1024px) {
+  .admin-layout-mobile-stack { flex-direction: column; }
+}

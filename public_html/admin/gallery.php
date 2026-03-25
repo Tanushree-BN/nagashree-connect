@@ -11,7 +11,7 @@ $images = get_gallery_images();
 ?>
 <div class="min-h-screen bg-muted flex admin-layout-mobile-stack">
   <?php include __DIR__ . '/../includes/sidebar.php'; ?>
-  <main class="flex-1 p-8 overflow-auto">
+  <main class="flex-1 p-8 overflow-auto admin-main-content">
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="font-display text-2xl font-bold text-foreground">Gallery Management</h1>
@@ -27,7 +27,7 @@ $images = get_gallery_images();
         <div class="sm:col-span-2">
           <label class="block text-sm font-medium text-foreground mb-1">Image Upload *</label>
           <div id="gallery-upload-box" class="rounded-lg border border-dashed border-input bg-background p-5 text-center transition-colors">
-            <img id="gallery-preview" alt="Selected gallery preview" class="hidden mx-auto mb-3 h-24 w-24 rounded-lg object-cover bg-muted" />
+            <img id="gallery-preview" alt="Selected gallery preview" class="hidden mx-auto mb-3 h-44 sm:h-52 w-full max-w-md rounded-lg object-cover bg-muted" />
             <p class="text-sm text-muted-foreground">Drag and drop an image here, or choose from your system.</p>
             <button type="button" id="gallery-pick-btn" class="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition-colors"><i data-lucide="upload" class="w-4 h-4"></i> Choose Image</button>
             <input type="file" id="gallery-file" accept="image/*" class="hidden" />
@@ -41,15 +41,6 @@ $images = get_gallery_images();
           <label class="block text-sm font-medium text-foreground mb-1">Alt Text *</label>
           <input name="alt" required class="w-full px-3 py-2 rounded-lg border border-input bg-background text-foreground text-sm" />
         </div>
-        <div>
-          <label class="block text-sm font-medium text-foreground mb-1">Category *</label>
-          <select name="category" class="w-full px-3 py-2 rounded-lg border border-input bg-background text-foreground text-sm">
-            <option value="events">Events</option>
-            <option value="classroom">Classroom</option>
-            <option value="sports">Sports</option>
-            <option value="facilities">Facilities</option>
-          </select>
-        </div>
       </div>
       <div class="flex gap-3">
         <button type="submit" id="gallery-submit-btn" class="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-gold text-secondary-foreground text-sm font-semibold hover:bg-gold-dark transition-colors"><i data-lucide="save" class="w-4 h-4"></i> Add</button>
@@ -57,31 +48,29 @@ $images = get_gallery_images();
       </div>
     </form>
 
-    <div class="bg-card rounded-xl border border-border overflow-hidden">
-      <table class="w-full text-sm">
-        <thead class="bg-muted">
-          <tr>
-            <th class="text-left px-4 py-3 text-muted-foreground font-medium">Preview</th>
-            <th class="text-left px-4 py-3 text-muted-foreground font-medium">Title</th>
-            <th class="text-left px-4 py-3 text-muted-foreground font-medium">Category</th>
-            <th class="text-right px-4 py-3 text-muted-foreground font-medium">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-border">
+    <div class="bg-card rounded-xl border border-border p-4 sm:p-6">
+      <?php if (count($images) === 0): ?>
+        <p class="text-center py-8 text-muted-foreground">No images yet.</p>
+      <?php else: ?>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <?php foreach ($images as $img): ?>
-            <tr class="hover:bg-muted/50">
-              <td class="px-4 py-3"><img src="<?= h($img['src']) ?>" alt="<?= h($img['alt']) ?>" class="w-12 h-12 rounded object-cover bg-muted" /></td>
-              <td class="px-4 py-3 text-foreground"><?= h($img['title']) ?></td>
-              <td class="px-4 py-3 capitalize text-muted-foreground"><?= h($img['category']) ?></td>
-              <td class="px-4 py-3 text-right">
-                <button data-edit-gallery='<?= h(json_encode($img, JSON_HEX_APOS | JSON_HEX_QUOT)) ?>' class="p-1.5 rounded text-muted-foreground hover:text-gold"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-                <button data-delete-gallery="<?= h((string) $img['id']) ?>" class="p-1.5 rounded text-muted-foreground hover:text-destructive"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-              </td>
-            </tr>
+            <article class="rounded-xl border border-border bg-background overflow-hidden">
+              <img src="<?= h($img['src']) ?>" alt="<?= h($img['alt']) ?>" class="w-full h-44 sm:h-52 object-cover bg-muted" width="300" height="208" loading="lazy" decoding="async" />
+              <div class="p-3 space-y-3">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-medium text-foreground truncate"><?= h($img['title']) ?></p>
+                  </div>
+                  <div class="flex items-center gap-1 shrink-0">
+                    <button data-edit-gallery="1" data-gallery-id="<?= h((string) ($img['id'] ?? '')) ?>" data-gallery-src="<?= h((string) ($img['src'] ?? '')) ?>" data-gallery-title="<?= h((string) ($img['title'] ?? '')) ?>" data-gallery-alt="<?= h((string) ($img['alt'] ?? '')) ?>" class="p-1.5 rounded text-muted-foreground hover:text-gold"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                    <button data-delete-gallery="<?= h((string) $img['id']) ?>" class="p-1.5 rounded text-muted-foreground hover:text-destructive"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                  </div>
+                </div>
+              </div>
+            </article>
           <?php endforeach; ?>
-        </tbody>
-      </table>
-      <?php if (count($images) === 0): ?><p class="text-center py-8 text-muted-foreground">No images yet.</p><?php endif; ?>
+        </div>
+      <?php endif; ?>
     </div>
   </main>
 </div>
@@ -207,13 +196,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.querySelectorAll('[data-edit-gallery]').forEach((button) => {
     button.addEventListener('click', function() {
-      const row = JSON.parse(button.getAttribute('data-edit-gallery'));
-      idInput.value = row.id;
-      srcInput.value = row.src || '';
-      setPreview(row.src || '');
-      form.querySelector('[name="title"]').value = row.title || '';
-      form.querySelector('[name="alt"]').value = row.alt || '';
-      form.querySelector('[name="category"]').value = row.category || 'events';
+      const id = button.getAttribute('data-gallery-id') || '';
+      const src = button.getAttribute('data-gallery-src') || '';
+      const title = button.getAttribute('data-gallery-title') || '';
+      const alt = button.getAttribute('data-gallery-alt') || '';
+
+      idInput.value = id;
+      srcInput.value = src;
+      setPreview(src);
+      form.querySelector('[name="title"]').value = title;
+      form.querySelector('[name="alt"]').value = alt;
       formTitle.textContent = 'Edit Image';
       submitBtn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Update';
       cancelEditBtn.classList.remove('hidden');

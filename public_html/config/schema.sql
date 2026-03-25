@@ -46,15 +46,15 @@ CREATE TABLE IF NOT EXISTS admissions (
   id INT AUTO_INCREMENT PRIMARY KEY,
   student_name VARCHAR(150) NOT NULL,
   parent_name VARCHAR(150) NOT NULL,
+  mother_name VARCHAR(150) NULL,
   dob VARCHAR(30) NOT NULL,
   gender VARCHAR(30) NOT NULL,
   class_applying VARCHAR(50) NOT NULL,
   phone VARCHAR(30) NOT NULL,
+  mother_phone VARCHAR(30) NULL,
   email VARCHAR(255) NULL,
   address TEXT NOT NULL,
   previous_school VARCHAR(255) NULL,
-  previous_grade VARCHAR(100) NULL,
-  aadhaar VARCHAR(30) NULL,
   seen TINYINT(1) DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

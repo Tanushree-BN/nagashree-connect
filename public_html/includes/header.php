@@ -29,6 +29,7 @@ if ($basePath !== '' && !defined('NAGASHREE_OUTPUT_REWRITE')) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="<?= h(app_url('/assets/images/nag-logo.png')) ?>" />
   <title><?= h($pageTitle) ?></title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

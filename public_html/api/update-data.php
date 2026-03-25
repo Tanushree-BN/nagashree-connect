@@ -89,35 +89,68 @@ try {
 
         case 'create_admission': {
             if ($pdo) {
-                $stmt = $pdo->prepare('INSERT INTO admissions (student_name, parent_name, dob, gender, class_applying, phone, email, address, previous_school, previous_grade, aadhaar) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-                $stmt->execute([
-                    trim($_POST['studentName'] ?? ''),
-                    trim($_POST['parentName'] ?? ''),
-                    trim($_POST['dob'] ?? ''),
-                    trim($_POST['gender'] ?? ''),
-                    trim($_POST['classApplying'] ?? ''),
-                    trim($_POST['phone'] ?? ''),
-                    trim($_POST['email'] ?? ''),
-                    trim($_POST['address'] ?? ''),
-                    trim($_POST['previousSchool'] ?? ''),
-                    trim($_POST['previousGrade'] ?? ''),
-                    trim($_POST['aadhaar'] ?? ''),
-                ]);
+                $studentName = trim($_POST['studentName'] ?? '');
+                $parentName = trim($_POST['parentName'] ?? '');
+                $motherName = trim($_POST['motherName'] ?? '');
+                $dob = trim($_POST['dob'] ?? '');
+                $gender = trim($_POST['gender'] ?? '');
+                $classApplying = trim($_POST['classApplying'] ?? '');
+                $phone = trim($_POST['phone'] ?? '');
+                $motherPhone = trim($_POST['motherPhone'] ?? '');
+                $email = trim($_POST['email'] ?? '');
+                $address = trim($_POST['address'] ?? '');
+                $previousSchool = trim($_POST['previousSchool'] ?? '');
+
+                try {
+                    $stmt = $pdo->prepare('INSERT INTO admissions (student_name, parent_name, mother_name, dob, gender, class_applying, phone, mother_phone, email, address, previous_school) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                    $stmt->execute([
+                        $studentName,
+                        $parentName,
+                        $motherName,
+                        $dob,
+                        $gender,
+                        $classApplying,
+                        $phone,
+                        $motherPhone,
+                        $email,
+                        $address,
+                        $previousSchool,
+                    ]);
+                } catch (Throwable $throwable) {
+                    $message = strtolower($throwable->getMessage());
+                    $isMotherColumnIssue = str_contains($message, 'mother_name') || str_contains($message, 'mother_phone');
+                    if (!$isMotherColumnIssue) {
+                        throw $throwable;
+                    }
+
+                    $stmt = $pdo->prepare('INSERT INTO admissions (student_name, parent_name, dob, gender, class_applying, phone, email, address, previous_school) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                    $stmt->execute([
+                        $studentName,
+                        $parentName,
+                        $dob,
+                        $gender,
+                        $classApplying,
+                        $phone,
+                        $email,
+                        $address,
+                        $previousSchool,
+                    ]);
+                }
             } else {
                 $admissions = storage_read('admissions');
                 $admissions[] = [
                     'id' => (int) round(microtime(true) * 1000),
                     'student_name' => trim($_POST['studentName'] ?? ''),
                     'parent_name' => trim($_POST['parentName'] ?? ''),
+                    'mother_name' => trim($_POST['motherName'] ?? ''),
                     'dob' => trim($_POST['dob'] ?? ''),
                     'gender' => trim($_POST['gender'] ?? ''),
                     'class_applying' => trim($_POST['classApplying'] ?? ''),
                     'phone' => trim($_POST['phone'] ?? ''),
+                    'mother_phone' => trim($_POST['motherPhone'] ?? ''),
                     'email' => trim($_POST['email'] ?? ''),
                     'address' => trim($_POST['address'] ?? ''),
                     'previous_school' => trim($_POST['previousSchool'] ?? ''),
-                    'previous_grade' => trim($_POST['previousGrade'] ?? ''),
-                    'aadhaar' => trim($_POST['aadhaar'] ?? ''),
                     'seen' => 0,
                     'created_at' => date('Y-m-d H:i:s'),
                 ];
@@ -150,6 +183,7 @@ try {
                 if ($src === '') {
                     throw new RuntimeException('Image is required');
                 }
+                $galleryCategory = 'general';
 
                 if ($pdo) {
                     $countStmt = $pdo->query('SELECT COUNT(*) AS total FROM gallery_images');
@@ -172,7 +206,7 @@ try {
                     $stmt->execute([
                         $src,
                         trim($_POST['alt'] ?? ''),
-                        trim($_POST['category'] ?? 'events'),
+                        $galleryCategory,
                         trim($_POST['title'] ?? ''),
                     ]);
                 } else {
@@ -181,7 +215,7 @@ try {
                         'id' => (int) round(microtime(true) * 1000),
                         'src' => $src,
                         'alt' => trim($_POST['alt'] ?? ''),
-                        'category' => trim($_POST['category'] ?? 'events'),
+                        'category' => $galleryCategory,
                         'title' => trim($_POST['title'] ?? ''),
                     ];
 
@@ -193,28 +227,59 @@ try {
 
             if ($action === 'update_gallery') {
                 $src = normalize_image_path($_POST['src'] ?? '', 'gallery');
+                $galleryCategory = 'general';
 
                 if ($pdo) {
                     $stmt = $pdo->prepare('UPDATE gallery_images SET src = ?, alt_text = ?, category = ?, title = ? WHERE id = ?');
                     $stmt->execute([
                         $src,
                         trim($_POST['alt'] ?? ''),
-                        trim($_POST['category'] ?? 'events'),
+                        $galleryCategory,
                         trim($_POST['title'] ?? ''),
                         (int) ($_POST['id'] ?? 0),
                     ]);
                 } else {
                     $id = (int) ($_POST['id'] ?? 0);
                     $gallery = storage_read('gallery_images');
+                    $updated = false;
                     foreach ($gallery as &$item) {
                         if ((int) ($item['id'] ?? 0) === $id) {
                             $item['src'] = $src;
                             $item['alt'] = trim($_POST['alt'] ?? '');
-                            $item['category'] = trim($_POST['category'] ?? 'events');
+                            $item['category'] = $galleryCategory;
                             $item['title'] = trim($_POST['title'] ?? '');
+                            $updated = true;
+                            break;
                         }
                     }
                     unset($item);
+
+                    if (!$updated) {
+                        $defaultItems = get_default_gallery_items();
+
+                        // Editing a seeded default item: hide the original seed and store edited copy
+                        if ($id >= 1 && $id <= count($defaultItems)) {
+                            $seededSrc = (string) ($defaultItems[$id - 1]['src'] ?? '');
+                            if ($seededSrc !== '') {
+                                $hidden = storage_read('gallery_hidden_seeds');
+                                if (!in_array($seededSrc, $hidden, true)) {
+                                    $hidden[] = $seededSrc;
+                                }
+
+                                if (!storage_write('gallery_hidden_seeds', $hidden)) {
+                                    throw new RuntimeException('Unable to update gallery image');
+                                }
+                            }
+
+                            $gallery[] = [
+                                'id' => (int) round(microtime(true) * 1000),
+                                'src' => $src,
+                                'alt' => trim($_POST['alt'] ?? ''),
+                                'category' => $galleryCategory,
+                                'title' => trim($_POST['title'] ?? ''),
+                            ];
+                        }
+                    }
 
                     if (!storage_write('gallery_images', $gallery)) {
                         throw new RuntimeException('Unable to update gallery image');

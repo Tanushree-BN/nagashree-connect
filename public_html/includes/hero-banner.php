@@ -4,7 +4,7 @@ $heroBreadcrumb = $heroBreadcrumb ?? '';
 ?>
 <section class="relative py-16 md:py-20 px-4 overflow-hidden">
   <div class="absolute inset-0">
-    <img src="/assets/images/bg1.JPG" alt="Background" class="w-full h-full object-cover" loading="eager" fetchpriority="high" />
+    <img src="/assets/images/bg1.JPG" alt="Background" class="w-full h-full object-cover" width="1920" height="1080" loading="eager" fetchpriority="high" />
     <div class="absolute inset-0 bg-navy-dark/80 backdrop-blur-[2px]"></div>
   </div>
   <div class="container mx-auto text-center relative z-10">

@@ -6,7 +6,7 @@ $contactInfo = CONTACT_INFO;
 ?>
 <div class="relative">
   <div class="absolute inset-0 h-[40vh] md:h-[50vh] min-h-[300px]">
-    <img src="/assets/images/bg3.JPG" alt="Nagashree Contact Background" class="w-full h-full object-cover" loading="eager" fetchpriority="high" />
+    <img src="/assets/images/bg3.JPG" alt="Nagashree Contact Background" class="w-full h-full object-cover" width="1920" height="1080" loading="eager" fetchpriority="high" />
     <div class="absolute inset-0 bg-navy-dark/80 backdrop-blur-[2px]"></div>
   </div>
   <div class="relative z-10">

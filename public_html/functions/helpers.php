@@ -2,6 +2,7 @@
 session_start();
 
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/image-optimization.php';
 
 define('SITE_NAME', 'Nagashree English School');
 
@@ -235,15 +236,15 @@ function bootstrap_database(): void
         id INT AUTO_INCREMENT PRIMARY KEY,
         student_name VARCHAR(150) NOT NULL,
         parent_name VARCHAR(150) NOT NULL,
+        mother_name VARCHAR(150) NULL,
         dob VARCHAR(30) NOT NULL,
         gender VARCHAR(30) NOT NULL,
         class_applying VARCHAR(50) NOT NULL,
         phone VARCHAR(30) NOT NULL,
+        mother_phone VARCHAR(30) NULL,
         email VARCHAR(255) NULL,
         address TEXT NOT NULL,
         previous_school VARCHAR(255) NULL,
-        previous_grade VARCHAR(100) NULL,
-        aadhaar VARCHAR(30) NULL,
         seen TINYINT(1) DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )');
@@ -510,6 +511,70 @@ function get_facilities_list(): array
             ],
             'image' => '/assets/images/std22.JPG',
         ],
+    ];
+}
+
+/**
+ * Get paginated gallery images
+ * Returns images with pagination support
+ * @param int $page Page number (1-indexed)
+ * @param int $limit Items per page
+ * @return array [images => [...], total => int, page => int, pages => int]
+ */
+function get_gallery_images_paginated(int $page = 1, int $limit = 15): array
+{
+    if ($page < 1) $page = 1;
+    if ($limit < 1) $limit = 15;
+
+    $allImages = get_gallery_images();
+    $total = count($allImages);
+    $pages = (int) ceil($total / $limit);
+    
+    if ($page > $pages && $pages > 0) {
+        $page = $pages;
+    }
+
+    $offset = ($page - 1) * $limit;
+    $images = array_slice($allImages, $offset, $limit);
+
+    return [
+        'images' => $images,
+        'total' => $total,
+        'page' => $page,
+        'pages' => $pages,
+        'limit' => $limit,
+    ];
+}
+
+/**
+ * Get paginated faculties
+ * Returns faculty members with pagination support
+ * @param int $page Page number (1-indexed)
+ * @param int $limit Items per page
+ * @return array [faculties => [...], total => int, page => int, pages => int]
+ */
+function get_faculties_paginated(int $page = 1, int $limit = 12): array
+{
+    if ($page < 1) $page = 1;
+    if ($limit < 1) $limit = 12;
+
+    $allFaculties = get_faculties();
+    $total = count($allFaculties);
+    $pages = (int) ceil($total / $limit);
+    
+    if ($page > $pages && $pages > 0) {
+        $page = $pages;
+    }
+
+    $offset = ($page - 1) * $limit;
+    $faculties = array_slice($allFaculties, $offset, $limit);
+
+    return [
+        'faculties' => $faculties,
+        'total' => $total,
+        'page' => $page,
+        'pages' => $pages,
+        'limit' => $limit,
     ];
 }
 
