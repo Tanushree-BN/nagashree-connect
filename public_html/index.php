@@ -4,8 +4,11 @@ $currentPath = '/';
 require_once __DIR__ . '/includes/header.php';
 
 $features = get_features();
-$offerings = get_offerings();
+$offerings = array_values(array_filter(get_offerings(), static function ($item) {
+  return strtolower((string) ($item['title'] ?? '')) !== 'certified teachers';
+}));
 $stats = get_stats();
+$dailyUpdates = get_daily_updates();
 $galleryImages = array_slice(get_gallery_images(), 0, 4);
 ?>
 <main>
@@ -73,15 +76,51 @@ $galleryImages = array_slice(get_gallery_images(), 0, 4);
     </div>
   </section>
 
+  <section class="section-padding bg-background">
+    <div class="container mx-auto">
+      <div class="text-center mb-12">
+        <span class="text-gold font-semibold text-sm uppercase tracking-widest">Daily Updates</span>
+        <h2 class="section-title mt-3">What’s Happening at School</h2>
+        <p class="section-subtitle mx-auto">Stay connected with regular activities and student milestones from our campus.</p>
+      </div>
+      <div id="daily-updates-list" class="grid md:grid-cols-2 gap-6">
+        <?php foreach ($dailyUpdates as $index => $item): ?>
+          <?php $updateIcon = strtolower((string) ($item['type'] ?? 'activity')) === 'highlight' ? 'star' : 'calendar-days'; ?>
+          <div class="bg-card rounded-xl border border-border p-6 card-hover<?= $index >= 4 ? ' hidden daily-update-older' : '' ?>">
+            <div class="w-12 h-12 rounded-lg bg-gold/10 text-gold flex items-center justify-center mb-4"><i data-lucide="<?= h($updateIcon) ?>" class="w-6 h-6"></i></div>
+            <h3 class="font-display text-xl font-semibold text-foreground mb-2"><?= h($item['title'] ?? '') ?></h3>
+            <p class="text-muted-foreground text-sm leading-relaxed"><?= h($item['description'] ?? '') ?></p>
+          </div>
+        <?php endforeach; ?>
+      </div>
+      <?php if (count($dailyUpdates) > 4): ?>
+        <div class="mt-8 flex justify-center">
+          <button id="daily-updates-toggle" type="button" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground hover:bg-muted transition-colors" aria-expanded="false" aria-controls="daily-updates-list">
+            <span id="daily-updates-toggle-text">Show Older Updates</span>
+            <i id="daily-updates-toggle-icon" data-lucide="chevron-down" class="w-4 h-4 transition-transform"></i>
+          </button>
+        </div>
+      <?php endif; ?>
+    </div>
+  </section>
+
   <section class="gradient-navy section-padding">
     <div class="container mx-auto">
       <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
-        <div id="school-video-container" class="relative aspect-video rounded-2xl overflow-hidden bg-navy-light">
-          <button id="video-trigger" class="w-full h-full flex items-center justify-center group">
-            <img src="/assets/images/bg2.JPG" alt="School video thumbnail" class="absolute inset-0 w-full h-full object-cover opacity-60" width="800" height="450" loading="lazy" decoding="async" />
-            <div class="relative w-20 h-20 rounded-full bg-gold flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg"><i data-lucide="play" class="w-8 h-8 text-secondary-foreground ml-1"></i></div>
-            <span class="absolute bottom-6 left-6 text-primary-foreground font-display text-xl font-bold">Nagashree English School</span>
-          </button>
+        <div class="space-y-4">
+          <div id="school-video-container" class="relative aspect-video rounded-2xl overflow-hidden bg-navy-light">
+            <button id="video-trigger" class="w-full h-full flex items-center justify-center group">
+              <img src="/assets/images/bg2.JPG" alt="School video thumbnail" class="absolute inset-0 w-full h-full object-cover opacity-60" width="800" height="450" loading="lazy" decoding="async" />
+              <div class="relative w-20 h-20 rounded-full bg-gold flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg"><i data-lucide="play" class="w-8 h-8 text-secondary-foreground ml-1"></i></div>
+              <span class="absolute bottom-6 left-6 text-primary-foreground font-display text-xl font-bold">Nagashree English School</span>
+            </button>
+          </div>
+          <!-- <div class="rounded-xl border border-primary-foreground/15 bg-primary-foreground/5 p-4 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-gold/15 text-gold flex items-center justify-center shrink-0">
+              <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+            </div>
+           
+          </div> -->
         </div>
         <div>
           <span class="text-gold font-semibold text-sm uppercase tracking-widest">About Our School</span>
@@ -90,8 +129,8 @@ $galleryImages = array_slice(get_gallery_images(), 0, 4);
         </div>
       </div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-        <?php foreach ($stats as $stat): ?>
-          <div class="text-center stat-card-lively rounded-xl p-4">
+         <?php foreach ($stats as $stat): ?>
+          <div class="text-center">
             <div class="stat-value text-4xl md:text-5xl font-bold text-gold" data-stat="<?= h((string) $stat['value']) ?>" data-suffix="<?= h($stat['suffix']) ?>">0<?= h($stat['suffix']) ?></div>
             <p class="text-primary-foreground/70 mt-2 text-sm font-medium"><?= h($stat['label']) ?></p>
           </div>

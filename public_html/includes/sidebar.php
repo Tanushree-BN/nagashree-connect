@@ -2,6 +2,7 @@
 $adminPath = $adminPath ?? '/admin/dashboard';
 $items = [
     ['label' => 'Gallery', 'path' => '/admin/gallery', 'icon' => 'image'],
+  ['label' => 'Daily Updates', 'path' => '/admin/daily-updates', 'icon' => 'calendar-days'],
     ['label' => 'Faculties', 'path' => '/admin/faculties', 'icon' => 'users'],
     ['label' => 'Messages', 'path' => '/admin/messages', 'icon' => 'message-square'],
     ['label' => 'Admissions', 'path' => '/admin/admissions', 'icon' => 'file-text'],

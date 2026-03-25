@@ -249,6 +249,14 @@ function bootstrap_database(): void
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )');
 
+    $pdo->exec('CREATE TABLE IF NOT EXISTS daily_updates (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(200) NOT NULL,
+        description TEXT NOT NULL,
+        update_type VARCHAR(50) NOT NULL DEFAULT "activity",
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )');
+
     $adminStmt = $pdo->query('SELECT COUNT(*) AS total FROM admin_users');
     $adminCount = (int) ($adminStmt->fetch()['total'] ?? 0);
 
@@ -263,6 +271,15 @@ function bootstrap_database(): void
         $insertGallery = $pdo->prepare('INSERT INTO gallery_images (src, alt_text, category, title) VALUES (?, ?, ?, ?)');
         foreach (get_default_gallery_items() as $item) {
             $insertGallery->execute([$item['src'], $item['alt'], $item['category'], $item['title']]);
+        }
+    }
+
+    $dailyUpdatesStmt = $pdo->query('SELECT COUNT(*) AS total FROM daily_updates');
+    $dailyUpdatesCount = (int) ($dailyUpdatesStmt->fetch()['total'] ?? 0);
+    if ($dailyUpdatesCount === 0) {
+        $insertDailyUpdate = $pdo->prepare('INSERT INTO daily_updates (title, description, update_type) VALUES (?, ?, ?)');
+        foreach (get_default_daily_updates() as $item) {
+            $insertDailyUpdate->execute([$item['title'], $item['description'], $item['type']]);
         }
     }
 
@@ -376,6 +393,62 @@ function get_gallery_categories(): array
     return ['all', 'events', 'classroom', 'sports', 'facilities'];
 }
 
+function get_default_daily_updates(): array
+{
+    return [
+        ['title' => 'Activities', 'description' => 'Weekly co-curricular events including science activities, language enrichment, and creative clubs.', 'type' => 'activity'],
+        ['title' => 'Student Highlights', 'description' => 'Student achievements in academics, sports, arts, and leadership are celebrated throughout the year.', 'type' => 'highlight'],
+    ];
+}
+
+function get_daily_updates(): array
+{
+    $pdo = get_db_connection();
+    if (!$pdo) {
+        $hiddenDefaultIds = array_map('intval', storage_read('daily_updates_hidden_seeds'));
+
+        $defaultItems = array_values(array_filter(array_map(static function ($item, $index) {
+            return [
+                'id' => $index + 1,
+                'title' => (string) ($item['title'] ?? ''),
+                'description' => (string) ($item['description'] ?? ''),
+                'type' => (string) ($item['type'] ?? 'activity'),
+            ];
+        }, get_default_daily_updates(), array_keys(get_default_daily_updates())), static function ($item) use ($hiddenDefaultIds) {
+            return !in_array((int) $item['id'], $hiddenDefaultIds, true);
+        }));
+
+        $storedItems = array_map(static function ($item) {
+            return [
+                'id' => (int) ($item['id'] ?? 0),
+                'title' => (string) ($item['title'] ?? ''),
+                'description' => (string) ($item['description'] ?? ''),
+                'type' => (string) ($item['type'] ?? 'activity'),
+            ];
+        }, storage_read('daily_updates'));
+
+        $merged = array_values(array_filter(array_merge($defaultItems, $storedItems), static function ($item) {
+            return (int) ($item['id'] ?? 0) > 0;
+        }));
+
+        usort($merged, static function ($a, $b) {
+            return ((int) ($b['id'] ?? 0)) <=> ((int) ($a['id'] ?? 0));
+        });
+
+        return $merged;
+    }
+
+    $stmt = $pdo->query('SELECT id, title, description, update_type FROM daily_updates ORDER BY id DESC');
+    return array_map(static function ($row) {
+        return [
+            'id' => (int) $row['id'],
+            'title' => (string) $row['title'],
+            'description' => (string) $row['description'],
+            'type' => (string) $row['update_type'],
+        ];
+    }, $stmt->fetchAll());
+}
+
 function get_features(): array
 {
     return [
@@ -405,12 +478,28 @@ function get_features(): array
 function get_offerings(): array
 {
     return [
-        ['icon' => 'shield', 'title' => 'Safety First', 'description' => 'Safety first means taking precautions to prevent accidents and injuries. It encourages awareness, responsibility, and careful behavior in all activities.'],
-        ['icon' => 'clock', 'title' => 'Regular Classes', 'description' => 'Regular classes provide structured learning in a standard classroom setting.'],
-        ['icon' => 'graduation-cap', 'title' => 'Certified Teachers', 'description' => 'Certified teachers are professionally trained and licensed to teach.'],
-        ['icon' => 'building', 'title' => 'Sufficient Classrooms', 'description' => 'Sufficient classrooms provide adequate space, seating, and learning facilities for students.'],
-        ['icon' => 'lightbulb', 'title' => 'Creative Lessons', 'description' => 'Creative lessons use new ideas, activities, and methods to make learning engaging. They encourage students to think critically and express themselves freely.'],
-        ['icon' => 'dumbbell', 'title' => 'Sports Facilities', 'description' => 'Sports facilities provide proper spaces and equipment for physical activities and games. They support fitness, teamwork, and skill development among students.'],
+        ['icon' => 'languages', 'title' => 'Spoken English', 'description' => 'Daily spoken-English activities to build confidence, fluency, and communication skills.'],
+        ['icon' => 'puzzle', 'title' => 'Activity-Based Learning', 'description' => 'Hands-on classroom experiences that improve understanding through projects and participation.'],
+        ['icon' => 'dumbbell', 'title' => 'Sports & Yoga', 'description' => 'Regular sports and yoga sessions for physical fitness, discipline, and mental wellbeing.'],
+        ['icon' => 'monitor-smartphone', 'title' => 'Digital Classrooms', 'description' => 'Technology-enabled teaching with smart-class support for engaging and interactive learning.'],
+    ];
+}
+
+function get_parent_reviews(): array
+{
+    return [
+        [
+            'name' => 'Parent of Grade 7 Learner',
+            'review' => 'The teachers are approachable and truly supportive. We have seen strong improvement in both academics and communication skills.',
+        ],
+        [
+            'name' => 'Parent of Grade 4 Learner',
+            'review' => 'A safe and encouraging school atmosphere. Activity-based learning has helped my child enjoy school and learn with confidence.',
+        ],
+        [
+            'name' => 'Parent of Grade 10 Learner',
+            'review' => 'Excellent academic mentoring and discipline. The school motivates students to perform well in board exams and beyond.',
+        ],
     ];
 }
 

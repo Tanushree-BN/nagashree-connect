@@ -165,6 +165,9 @@ try {
         case 'add_gallery':
         case 'update_gallery':
         case 'delete_gallery':
+        case 'add_daily_update':
+        case 'update_daily_update':
+        case 'delete_daily_update':
         case 'add_faculty':
         case 'update_faculty':
         case 'delete_faculty':
@@ -319,6 +322,120 @@ try {
 
                         if (!storage_write('gallery_images', $gallery)) {
                             throw new RuntimeException('Unable to delete gallery image');
+                        }
+                    }
+                }
+            }
+
+            if ($action === 'add_daily_update') {
+                $title = trim($_POST['title'] ?? '');
+                $description = trim($_POST['description'] ?? '');
+                $updateType = 'activity';
+
+                if ($title === '' || $description === '') {
+                    throw new RuntimeException('Title and description are required');
+                }
+
+                if ($pdo) {
+                    $stmt = $pdo->prepare('INSERT INTO daily_updates (title, description, update_type) VALUES (?, ?, ?)');
+                    $stmt->execute([$title, $description, $updateType]);
+                } else {
+                    $updates = storage_read('daily_updates');
+                    $updates[] = [
+                        'id' => (int) round(microtime(true) * 1000),
+                        'title' => $title,
+                        'description' => $description,
+                        'type' => $updateType,
+                    ];
+
+                    if (!storage_write('daily_updates', $updates)) {
+                        throw new RuntimeException('Unable to store daily update');
+                    }
+                }
+            }
+
+            if ($action === 'update_daily_update') {
+                $id = (int) ($_POST['id'] ?? 0);
+                $title = trim($_POST['title'] ?? '');
+                $description = trim($_POST['description'] ?? '');
+                $updateType = 'activity';
+
+                if ($id <= 0 || $title === '' || $description === '') {
+                    throw new RuntimeException('Valid update data is required');
+                }
+
+                if ($pdo) {
+                    $stmt = $pdo->prepare('UPDATE daily_updates SET title = ?, description = ?, update_type = ? WHERE id = ?');
+                    $stmt->execute([$title, $description, $updateType, $id]);
+                } else {
+                    $updates = storage_read('daily_updates');
+                    $updated = false;
+                    foreach ($updates as &$update) {
+                        if ((int) ($update['id'] ?? 0) === $id) {
+                            $update['title'] = $title;
+                            $update['description'] = $description;
+                            $update['type'] = $updateType;
+                            $updated = true;
+                            break;
+                        }
+                    }
+                    unset($update);
+
+                    if (!$updated) {
+                        $defaultUpdates = get_default_daily_updates();
+                        if ($id >= 1 && $id <= count($defaultUpdates)) {
+                            $hidden = array_map('intval', storage_read('daily_updates_hidden_seeds'));
+                            if (!in_array($id, $hidden, true)) {
+                                $hidden[] = $id;
+                            }
+
+                            if (!storage_write('daily_updates_hidden_seeds', $hidden)) {
+                                throw new RuntimeException('Unable to update daily update');
+                            }
+
+                            $originalType = (string) ($defaultUpdates[$id - 1]['type'] ?? 'activity');
+                            $updates[] = [
+                                'id' => (int) round(microtime(true) * 1000),
+                                'title' => $title,
+                                'description' => $description,
+                                'type' => $originalType,
+                            ];
+                        }
+                    }
+
+                    if (!storage_write('daily_updates', $updates)) {
+                        throw new RuntimeException('Unable to update daily update');
+                    }
+                }
+            }
+
+            if ($action === 'delete_daily_update') {
+                $id = (int) ($_POST['id'] ?? 0);
+                if ($id <= 0) {
+                    throw new RuntimeException('Invalid daily update');
+                }
+
+                if ($pdo) {
+                    $stmt = $pdo->prepare('DELETE FROM daily_updates WHERE id = ?');
+                    $stmt->execute([$id]);
+                } else {
+                    $defaultUpdates = get_default_daily_updates();
+                    if ($id >= 1 && $id <= count($defaultUpdates)) {
+                        $hidden = array_map('intval', storage_read('daily_updates_hidden_seeds'));
+                        if (!in_array($id, $hidden, true)) {
+                            $hidden[] = $id;
+                        }
+
+                        if (!storage_write('daily_updates_hidden_seeds', $hidden)) {
+                            throw new RuntimeException('Unable to delete daily update');
+                        }
+                    } else {
+                        $updates = array_values(array_filter(storage_read('daily_updates'), static function ($item) use ($id) {
+                            return (int) ($item['id'] ?? 0) !== $id;
+                        }));
+
+                        if (!storage_write('daily_updates', $updates)) {
+                            throw new RuntimeException('Unable to delete daily update');
                         }
                     }
                 }

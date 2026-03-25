@@ -108,6 +108,50 @@ document.addEventListener("DOMContentLoaded", function () {
     observer.observe(element);
   });
 
+  var dailyUpdatesToggle = document.getElementById("daily-updates-toggle");
+  if (dailyUpdatesToggle) {
+    var dailyUpdatesToggleText = document.getElementById(
+      "daily-updates-toggle-text",
+    );
+    var dailyUpdatesToggleIcon = document.getElementById(
+      "daily-updates-toggle-icon",
+    );
+
+    dailyUpdatesToggle.addEventListener("click", function () {
+      var olderItems = document.querySelectorAll(".daily-update-older");
+      var expanded =
+        dailyUpdatesToggle.getAttribute("aria-expanded") === "true";
+      var nextExpandedState = !expanded;
+
+      olderItems.forEach(function (item) {
+        if (nextExpandedState) {
+          item.classList.remove("hidden");
+        } else {
+          item.classList.add("hidden");
+        }
+      });
+
+      dailyUpdatesToggle.setAttribute(
+        "aria-expanded",
+        nextExpandedState ? "true" : "false",
+      );
+
+      if (dailyUpdatesToggleText) {
+        dailyUpdatesToggleText.textContent = nextExpandedState
+          ? "Hide Older Updates"
+          : "Show Older Updates";
+      }
+
+      if (dailyUpdatesToggleIcon) {
+        if (nextExpandedState) {
+          dailyUpdatesToggleIcon.classList.add("rotate-180");
+        } else {
+          dailyUpdatesToggleIcon.classList.remove("rotate-180");
+        }
+      }
+    });
+  }
+
   var contactForm = document.getElementById("contact-form");
   if (contactForm) {
     contactForm.addEventListener("submit", async function (event) {
